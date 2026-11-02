@@ -5,11 +5,11 @@
 - 10 个真实模型用例，**两批独立运行，两批 10/10 都达到预期状态**（`examples/real/summary.json` 中 `status_ok` 全为 `true`）。
 - 全量测试 **240 passed，0 skipped，0 failed**（`examples/test-results.txt`，本机复跑同结果）。
 - 模型：`deepseek-v4.1-flash`，通过 OpenAI 兼容接口调用。
-- 运行时间：第一批 2026-11-02T10:48:13Z 起（commit `bfac6f7`），第二批 2026-11-02T10:54:37Z–11:04:58Z（commit `ae98952`，即当前 `examples/real/` 内容）。日期均为 2026-11-02。
+- 运行时间：第一批 2026-11-02T10:48:13Z 起（commit `bfac6f7`），第二批 2026-11-02T10:54:37Z–11:04:58Z（commit `ae98952`；终审后 `09_query_rewrite` 重跑过一次，其余 9 个用例仍是这一批）。日期均为 2026-11-02。
 
 ## 验收映射表
 
-预期取 `examples/cases.json` 的 `expect.status`，实际取 `examples/real/summary.json`（当前第二批）与对应 `result.json`。模型 `deepseek-v4.1-flash`，运行日期 2026-11-02。
+预期取 `examples/cases.json` 的 `expect.status`，实际取 `examples/real/summary.json`（当前内容：第二批 9 个用例 + `09_query_rewrite` 的终审后重跑）与对应 `result.json`。模型 `deepseek-v4.1-flash`，运行日期 2026-11-02。
 
 | 验收点 | 用例 | 路径（`examples/real/<case>/`） | 预期 | 实际（`summary.json` + `result.json`） |
 |---|---|---|---|---|
@@ -113,7 +113,7 @@
 
 ### 两批真实运行
 
-**两批都没有用例偏离预期。** 第一批（`bfac6f7`）10/10 `status_ok=true`；第二批（`ae98952`，即当前 `examples/real/`）同样 10/10。
+**两批都没有用例偏离预期。** 第一批（`bfac6f7`）10/10 `status_ok=true`；第二批（`ae98952`）同样 10/10；当前 `examples/real/` 是第二批，其中 `09_query_rewrite` 为终审后重跑。
 
 两批之间**没有做任何改动**：`git diff --stat bfac6f7 ae98952 -- src data tests scripts examples/cases.json examples/inputs` 无输出；`git show --name-only ae98952` 只包含 `examples/real/` 和 `examples/test-results.txt`。`src/script_agent/prompts.py` 自 `f63f9e1` 之后没有再改动，所以两批之间也没有 Prompt 改动。
 
