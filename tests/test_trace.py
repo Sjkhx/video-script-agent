@@ -109,3 +109,96 @@ def test_trace_md_shows_only_title_and_shot_count_for_script_args(tmp_path):
     assert all(column in md for column in ["步骤", "动作", "关键参数", "返回摘要", "下一步", "决策依据"])
     assert "静音也能看懂" in md and "分镜" in md and "4" in md
     assert "画面内容不该出现" not in md and "旁白内容不该出现" not in md
+
+
+def test_result_summary_is_redacted_in_jsonl_and_markdown(tmp_path):
+    key = "sk-summary-should-not-leak"
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={}, fault=None, max_steps=10, max_tool_calls=20)
+    t.step(
+        round=1,
+        seq=1,
+        action="check_rules",
+        args={},
+        observation={"ok": False, "error": {"code": "TOOL_UNAVAILABLE", "message": f"上游返回 {key}"}},
+        decision_note="工具失败",
+        injected_fault=False,
+        usage={},
+    )
+    t.finish(AgentResult(status="failed", message="失败", mode="mock", steps_used=1, tool_calls_used=1))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    md = (tmp_path / "trace.md").read_text(encoding="utf-8")
+    assert key not in jsonl and key not in md
+    assert "TOOL_UNAVAILABLE" in jsonl and "TOOL_UNAVAILABLE" in md
+
+
+@pytest.mark.parametrize("name", [
+    "clientSecret", "x-api-key", "OPENAI_API_KEY", "authorization",
+])
+def test_prefixed_and_camel_case_key_names_are_dropped(tmp_path, name):
+    value = "plain-credential-value-with-no-prefix"
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={}, fault=None, max_steps=10, max_tool_calls=20)
+    t.step(
+        round=1,
+        seq=1,
+        action="search_materials",
+        args={"query": "字幕", name: value},
+        observation={"ok": True, "count": 1, "materials": [{"id": "P01"}], name: value},
+        decision_note="检索",
+        injected_fault=False,
+        usage={},
+    )
+    t.finish(AgentResult(status="completed", message="完成", mode="mock", steps_used=1, tool_calls_used=1))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    assert value not in jsonl
+
+
+def test_note_redacts_caller_supplied_secret(tmp_path):
+    secret = "my-custom-credential-9f8e7d"
+    t = TraceRecorder(
+        tmp_path, mode="real", model="m", request={}, fault=None,
+        max_steps=10, max_tool_calls=20, secrets=[secret],
+    )
+    t.note(round=1, event="llm_retry", detail=f"请求携带 {secret} 被拒绝")
+    t.finish(AgentResult(status="failed", message="失败", mode="real", steps_used=1, tool_calls_used=0))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    md = (tmp_path / "trace.md").read_text(encoding="utf-8")
+    assert secret not in jsonl and secret not in md
+    assert "llm_retry" in jsonl
+    assert "被拒绝" in md
+
+
+def test_token_usage_is_not_redacted_by_key_name_filter(tmp_path):
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={}, fault=None, max_steps=10, max_tool_calls=20)
+    t.step(
+        round=1,
+        seq=1,
+        action="search_materials",
+        args={},
+        observation={"ok": True, "count": 0, "materials": []},
+        decision_note="无素材",
+        injected_fault=False,
+        usage={"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5},
+    )
+    t.finish(AgentResult(status="completed", message="完成", mode="mock", steps_used=1, tool_calls_used=1))
+    lines = [json.loads(x) for x in (tmp_path / "trace.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert lines[1]["usage"] == {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5}
+    assert lines[-1]["total_tokens"] == 5
+
+
+def test_non_dict_args_raw_string_is_redacted(tmp_path):
+    key = "sk-raw-args-should-not-leak"
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={}, fault=None, max_steps=10, max_tool_calls=20)
+    t.step(
+        round=1,
+        seq=1,
+        action="search_materials",
+        args=f"not-an-object {key}",
+        observation={"ok": True, "count": 0, "materials": []},
+        decision_note="参数非法",
+        injected_fault=False,
+        usage={},
+    )
+    t.finish(AgentResult(status="failed", message="失败", mode="mock", steps_used=1, tool_calls_used=1))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    md = (tmp_path / "trace.md").read_text(encoding="utf-8")
+    assert key not in jsonl and key not in md

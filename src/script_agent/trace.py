@@ -7,7 +7,7 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from .models import AgentResult
 
@@ -29,16 +29,70 @@ _SECRET_KEYS = {
     "api_key",
     "apikey",
     "authorization",
+    "auth",
     "secret",
     "client_secret",
     "password",
     "passwd",
+    "token",
     "access_token",
     "accesstoken",
     "refresh_token",
     "refreshtoken",
+    "id_token",
+    "auth_token",
+    "bearer_token",
+    "session_token",
 }
+
+# 这些是用量统计，不是凭据；按名字脱敏时必须放行，否则 token 计数会丢。
+_USAGE_TOKEN_KEYS = {
+    "prompt_tokens",
+    "completion_tokens",
+    "total_tokens",
+    "input_tokens",
+    "output_tokens",
+    "cached_tokens",
+    "reasoning_tokens",
+    "max_tokens",
+}
+
 _KEY_PATTERN = re.compile(r"sk-[A-Za-z0-9._\-]{4,}")
+_CAMEL_BOUNDARY = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
+_KEY_SEPARATORS = re.compile(r"[\s\-]+")
+_KEY_UNDERSCORES = re.compile(r"_+")
+
+
+def _normalize_key(name: object) -> str:
+    """clientSecret / x-api-key / OPENAI_API_KEY 统一成 snake_case 小写。"""
+    text = str(name).strip()
+    text = _CAMEL_BOUNDARY.sub("_", text)
+    text = _KEY_SEPARATORS.sub("_", text)
+    return _KEY_UNDERSCORES.sub("_", text).strip("_").lower()
+
+
+def _is_secret_key(name: object) -> bool:
+    """判断参数名是否属于凭据：精确名、前缀形式（x-api-key）与驼峰形式都算。"""
+    normalized = _normalize_key(name)
+    if not normalized:
+        return False
+    if normalized in _SECRET_KEYS:
+        return True
+    if "api_key" in normalized or "apikey" in normalized:
+        return True
+    if "secret" in normalized:
+        return True
+    if normalized.startswith("authorization") or normalized.endswith(
+        "_authorization"
+    ):
+        return True
+    # 用量统计（复数 _tokens）不是凭据，不能删。
+    if normalized in _USAGE_TOKEN_KEYS or normalized.endswith("_tokens"):
+        return False
+    # 单数 token 结尾通常是凭据：access_token / auth_token / session_token。
+    if normalized == "token" or normalized.endswith("_token"):
+        return True
+    return False
 
 
 def _int(value: Any, default: int = 0) -> int:
@@ -73,36 +127,41 @@ def _clip(text: Any, limit: int = 80) -> str:
     return flat if len(flat) <= limit else flat[: limit - 1] + "…"
 
 
-def _redact_text(text: str) -> str:
-    return _KEY_PATTERN.sub("sk-***", text)
+def _redact_text(text: str, secrets: Iterable[str] = ()) -> str:
+    """先按已知密钥字面量替换，再处理 sk- 样式；两处都要做。"""
+    redacted = text
+    for secret in secrets:
+        if secret:
+            redacted = redacted.replace(secret, "***")
+    return _KEY_PATTERN.sub("sk-***", redacted)
 
 
-def _clean(value: Any) -> Any:
-    """递归复制并去掉模型内部字段、密钥字段，字符串里的密钥样式也脱敏。"""
+def _clean(value: Any, secrets: Iterable[str] = ()) -> Any:
+    """递归复制并去掉模型内部字段、密钥字段，字符串里的密钥也脱敏。"""
     if isinstance(value, dict):
         cleaned: dict = {}
         for key, item in value.items():
             name = str(key)
-            normalized = name.strip().lower().replace("-", "_")
-            if normalized in _INTERNAL_KEYS or normalized in _SECRET_KEYS:
+            normalized = _normalize_key(name)
+            if normalized in _INTERNAL_KEYS or _is_secret_key(name):
                 continue
-            cleaned[name] = _clean(item)
+            cleaned[name] = _clean(item, secrets)
         return cleaned
     if isinstance(value, (list, tuple)):
-        return [_clean(item) for item in value]
+        return [_clean(item, secrets) for item in value]
     if isinstance(value, str):
-        return _redact_text(value)
+        return _redact_text(value, secrets)
     if value is None or isinstance(value, (int, float, bool)):
         return value
     if hasattr(value, "model_dump"):
         try:
-            return _clean(value.model_dump(exclude_none=True))
+            return _clean(value.model_dump(exclude_none=True), secrets)
         except (TypeError, ValueError):
             pass
-    return _redact_text(str(value))
+    return _redact_text(str(value), secrets)
 
 
-def _clean_usage(usage: Any) -> dict:
+def _clean_usage(usage: Any, secrets: Iterable[str] = ()) -> dict:
     """usage 可能是 SDK 的 pydantic 对象，统一成普通 dict；缺失时补零。"""
     if usage is None:
         return {"prompt_tokens": 0, "completion_tokens": 0}
@@ -116,7 +175,7 @@ def _clean_usage(usage: Any) -> dict:
             usage = dict(usage)
         except (TypeError, ValueError):
             return {"prompt_tokens": 0, "completion_tokens": 0}
-    cleaned = _clean(usage)
+    cleaned = _clean(usage, secrets)
     for key in list(cleaned):
         if key.endswith("_tokens") and isinstance(cleaned[key], float) and cleaned[key].is_integer():
             cleaned[key] = int(cleaned[key])
@@ -245,11 +304,17 @@ class TraceRecorder:
         fault: dict | None,
         max_steps: int,
         max_tool_calls: int,
+        secrets: Iterable[str] = (),
     ) -> None:
         self.out_dir = Path(out_dir)
         self.out_dir.mkdir(parents=True, exist_ok=True)
         self._jsonl_path = self.out_dir / "trace.jsonl"
         self._md_path = self.out_dir / "trace.md"
+        # 已知密钥字面量：不是 sk- 形状的凭据也能从自由文本里挡掉。
+        # 长的先替换，避免短密钥是长密钥子串时留下残片。
+        self._secrets = tuple(
+            sorted({str(item) for item in secrets if item}, key=len, reverse=True)
+        )
 
         self.run_id = uuid.uuid4().hex
         self.started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -265,8 +330,8 @@ class TraceRecorder:
             "mode": str(mode),
             "model": str(model),
             "started_at": self.started_at,
-            "request": _clean(request) if isinstance(request, dict) else {},
-            "fault": _clean(fault) if isinstance(fault, dict) else None,
+            "request": _clean(request, self._secrets) if isinstance(request, dict) else {},
+            "fault": _clean(fault, self._secrets) if isinstance(fault, dict) else None,
             "max_steps": _int(max_steps),
             "max_tool_calls": _int(max_tool_calls),
         })
@@ -285,7 +350,7 @@ class TraceRecorder:
     ) -> None:
         self._ensure_open()
         round_no = _int(round)
-        usage_dict = _clean_usage(usage)
+        usage_dict = _clean_usage(usage, self._secrets)
         # 同一轮内多个工具调用共享同一份 usage，只按轮记一次。
         # 若先记到空 usage、后面才拿到真实用量，用非空的那份覆盖。
         existing = self._usage_by_round.get(round_no)
@@ -293,15 +358,23 @@ class TraceRecorder:
             _usage_total(existing) == 0 and _usage_total(usage_dict) > 0
         ):
             self._usage_by_round[round_no] = usage_dict
+        # 摘要会同时进 jsonl 和 md，必须和 result 一样脱敏；它来自原始 observation。
+        summary = _redact_text(
+            summarize_observation(str(action), observation), self._secrets
+        )
         record = {
             "type": "step",
             "round": round_no,
             "seq": _int(seq),
             "action": str(action),
-            "args": _clean(args) if isinstance(args, dict) else {"_raw": str(args)},
-            "result_summary": summarize_observation(str(action), observation),
-            "result": _clean(observation) if isinstance(observation, dict) else {},
-            "decision_note": _redact_text(str(decision_note or "")),
+            "args": (
+                _clean(args, self._secrets)
+                if isinstance(args, dict)
+                else {"_raw": _redact_text(str(args), self._secrets)}
+            ),
+            "result_summary": summary,
+            "result": _clean(observation, self._secrets) if isinstance(observation, dict) else {},
+            "decision_note": _redact_text(str(decision_note or ""), self._secrets),
             "next_action": None,
             "injected_fault": bool(injected_fault),
             "usage": usage_dict,
@@ -315,8 +388,8 @@ class TraceRecorder:
             "type": "note",
             "round": _int(round),
             "event": str(event),
-            # note 的 detail 是自由文本，同样要挡掉密钥样式。
-            "detail": _redact_text(_clip(detail, 300)),
+            # note 的 detail 是自由文本，同样要挡掉密钥样式和已知密钥。
+            "detail": _redact_text(_clip(detail, 300), self._secrets),
         }
         self._notes.append(record)
         self._append(record)
