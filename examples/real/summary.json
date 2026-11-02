@@ -1,0 +1,170 @@
+[
+  {
+    "name": "01_normal",
+    "status": "completed",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "search_materials",
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "submit_script"
+    ],
+    "covers": "正常生成、参考实例",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 28185
+  },
+  {
+    "name": "02_missing_target",
+    "status": "needs_input",
+    "status_ok": true,
+    "path": [
+      "ask_user"
+    ],
+    "covers": "缺关键信息",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 2604
+  },
+  {
+    "name": "03_no_material",
+    "status": "needs_input",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "search_materials",
+      "search_materials",
+      "ask_user"
+    ],
+    "covers": "无素材、改写查询后请求补充",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 11173
+  },
+  {
+    "name": "04_tool_fail_transient",
+    "status": "completed",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "search_materials",
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "submit_script"
+    ],
+    "covers": "工具失败后恢复",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 37390
+  },
+  {
+    "name": "05_tool_fail_permanent",
+    "status": "failed",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "search_materials",
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "report_failure"
+    ],
+    "covers": "工具失败、明确失败",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 26206
+  },
+  {
+    "name": "06_over_duration_fixed",
+    "status": "completed",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "submit_script"
+    ],
+    "covers": "超时长后修正",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 20410
+  },
+  {
+    "name": "07_over_duration_infeasible",
+    "status": "failed",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "estimate_duration",
+      "report_failure"
+    ],
+    "covers": "超时长、明确失败",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 16108
+  },
+  {
+    "name": "08_rule_conflict",
+    "status": "completed",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "search_materials",
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "submit_script"
+    ],
+    "covers": "规则风险、不编造",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 49231
+  },
+  {
+    "name": "09_query_rewrite",
+    "status": "completed",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "search_materials",
+      "search_materials",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "estimate_duration",
+      "check_rules",
+      "submit_script"
+    ],
+    "covers": "改写查询",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 34376
+  },
+  {
+    "name": "10_materials_changed",
+    "status": "needs_input",
+    "status_ok": true,
+    "path": [
+      "search_materials",
+      "search_materials",
+      "search_materials",
+      "ask_user"
+    ],
+    "covers": "改检索结果后动作变化",
+    "model": "deepseek-v4.1-flash",
+    "total_tokens": 11130
+  }
+]

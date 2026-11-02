@@ -1,0 +1,22 @@
+{
+  "status": "needs_input",
+  "message": "原因：已用 3 种不同查询检索「剪刀鱼」字幕相关素材均无结果，脚本中的产品事实必须来自素材，目前无任何可用来源。；缺少信息：materials；需要确认：请问「剪刀鱼」是哪个产品（App／剪辑软件）？能否提供它的字幕功能官方素材、功能介绍或功能截图说明？；字幕功能具体涉及哪些点可以讲（如自动识别、识别准确率、支持语言、样式模板、导出等）？请提供可引用的官方描述原文。；如果没有官方素材，是否可以先按「不含产品事实」的通用口播思路写脚本（不提具体功能与数据）？",
+  "mode": "real",
+  "title": null,
+  "shots": null,
+  "total_duration_sec": null,
+  "target_duration_sec": 30.0,
+  "source_ids": [],
+  "checks": {
+    "duration": "not_run",
+    "rules": "not_run"
+  },
+  "risks": [],
+  "missing_info": [
+    "materials"
+  ],
+  "unverified_draft": null,
+  "last_estimate": null,
+  "steps_used": 4,
+  "tool_calls_used": 4
+}

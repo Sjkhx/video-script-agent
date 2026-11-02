@@ -1,0 +1,122 @@
+{
+  "status": "completed",
+  "message": "脚本已通过时长与规则检查，共 6 个分镜，预计总时长 27.5 秒。",
+  "mode": "real",
+  "title": "新手必看：剪刀鱼的字幕功能速览",
+  "shots": [
+    {
+      "id": 1,
+      "visual": "新手对着电脑抱头，时间轴上一条字幕都没有",
+      "narration": "剪完视频才发现忘加字幕？很多新手都卡在这一步。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 5.75,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 2,
+      "visual": "录屏打开剪刀鱼界面，镜头缓缓推近",
+      "narration": "看剪刀鱼的字幕功能。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 2.75,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 3,
+      "visual": "录屏特写：一段视频上叠加出字幕文字",
+      "narration": "这次只说一点：剪刀鱼支持字幕。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 3.75,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 4,
+      "visual": "三种常见素材分段展示，每段都配上字幕",
+      "narration": "口播、剧情、教程，字幕对上画面才有人看完。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 4.75,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 5,
+      "visual": "滑看竖屏模板列表，点开一条竖屏素材并加上字幕",
+      "narration": "剪刀鱼提供 30 套竖屏模板，竖屏里照样加字幕。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        },
+        {
+          "source_id": "P02",
+          "quote": "提供 30 套竖屏模板"
+        }
+      ],
+      "duration_sec": 5.25,
+      "source_ids": [
+        "P01",
+        "P02"
+      ]
+    },
+    {
+      "id": 6,
+      "visual": "对着镜头提问，结尾定格留提问字幕",
+      "narration": "你平时怎么加字幕？剪刀鱼，剪出属于你的故事。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 5.25,
+      "source_ids": [
+        "P01"
+      ]
+    }
+  ],
+  "total_duration_sec": 27.5,
+  "target_duration_sec": 30.0,
+  "source_ids": [
+    "P01",
+    "P02"
+  ],
+  "checks": {
+    "duration": "pass",
+    "rules": "pass"
+  },
+  "risks": [
+    "需求要求写明“效率提升 80%”，但本次检索到的素材（P01「支持字幕」、P02「提供 30 套竖屏模板」）均无效率类数据支持，按规则未写入脚本；如必须出现该数字，请提供含该数据的官方素材。",
+    "素材仅两条、事实极少，脚本只能点到“支持字幕”与“30 套竖屏模板”，未写自动识别、识别准确率等能力。"
+  ],
+  "missing_info": [],
+  "unverified_draft": null,
+  "last_estimate": null,
+  "steps_used": 8,
+  "tool_calls_used": 11
+}

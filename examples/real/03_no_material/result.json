@@ -1,0 +1,22 @@
+{
+  "status": "needs_input",
+  "message": "原因：已用“剪刀鱼 直播推流 功能”“剪刀鱼 直播 推流 一键开播”“剪刀鱼”三次不同检索，素材库均无命中。脚本里的产品事实必须来自检索到的素材，否则无法写到功能、数字与效果，需要您补充素材或更正产品关键词。；缺少信息：materials；需要确认：请提供“剪刀鱼”直播推流功能的素材（如功能说明、支持平台、操作步骤、画质/延迟等官方描述），或告知素材库中的正确产品名称/关键词。",
+  "mode": "real",
+  "title": null,
+  "shots": null,
+  "total_duration_sec": null,
+  "target_duration_sec": 30.0,
+  "source_ids": [],
+  "checks": {
+    "duration": "not_run",
+    "rules": "not_run"
+  },
+  "risks": [],
+  "missing_info": [
+    "materials"
+  ],
+  "unverified_draft": null,
+  "last_estimate": null,
+  "steps_used": 4,
+  "tool_calls_used": 4
+}

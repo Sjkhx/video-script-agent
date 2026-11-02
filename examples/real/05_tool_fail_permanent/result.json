@@ -1,0 +1,95 @@
+{
+  "status": "failed",
+  "message": "脚本已完成：时长检查通过（总时长 29.75 秒，目标 30 秒，verdict=pass），产品事实仅引用素材 P01 的「支持字幕」。但规则检查工具 check_rules 连续两次返回 TOOL_UNAVAILABLE，第二次 retries_left=0，无法取得规则检查结论。按流程只有同一份脚本的时长与规则检查同时通过才能提交，因此本次无法交付已验收脚本。；未满足的要求：品牌规则与素材来源检查未完成（check_rules 工具不可用）；脚本未通过 submit_script 正式提交",
+  "mode": "real",
+  "title": null,
+  "shots": null,
+  "total_duration_sec": null,
+  "target_duration_sec": 30.0,
+  "source_ids": [],
+  "checks": {
+    "duration": "pass",
+    "rules": "error"
+  },
+  "risks": [],
+  "missing_info": [],
+  "unverified_draft": {
+    "title": "剪刀鱼字幕功能｜新手30秒上手",
+    "shots": [
+      {
+        "id": 1,
+        "visual": "手机屏幕特写：时间轴上画面都排好了，字幕轨道却是空的，创作者抓头",
+        "narration": "新手剪第一条视频，最怕的不是没素材，而是字幕。",
+        "claims": []
+      },
+      {
+        "id": 2,
+        "visual": "逐字输入字幕，来回暂停播放对时间点，屏幕反光映出疲惫的脸",
+        "narration": "一句一句敲，还得对着时间轴反复调，眼睛都要花了。",
+        "claims": []
+      },
+      {
+        "id": 3,
+        "visual": "打开剪刀鱼，界面推进到字幕相关入口，手指点了一下",
+        "narration": "后来才知道，剪刀鱼是支持字幕的，这一块终于不用自己硬扛。",
+        "claims": [
+          {
+            "source_id": "P01",
+            "quote": "支持字幕"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "visual": "先把画面剪顺、节奏卡上，再回头看字幕，进度条一点点往前走",
+        "narration": "先把画面和节奏剪顺，字幕再一点点磨，步骤清楚就不慌。",
+        "claims": []
+      },
+      {
+        "id": 5,
+        "visual": "正面出镜微笑，手机举在胸前，画面打出“字幕安排明白”字样",
+        "narration": "你也来试试，第一条视频，从把字幕安排明白开始。",
+        "claims": []
+      }
+    ]
+  },
+  "last_estimate": {
+    "ok": true,
+    "shots": [
+      {
+        "id": 1,
+        "units": 20,
+        "duration_sec": 5.5
+      },
+      {
+        "id": 2,
+        "units": 21,
+        "duration_sec": 5.75
+      },
+      {
+        "id": 3,
+        "units": 25,
+        "duration_sec": 6.75
+      },
+      {
+        "id": 4,
+        "units": 23,
+        "duration_sec": 6.25
+      },
+      {
+        "id": 5,
+        "units": 20,
+        "duration_sec": 5.5
+      }
+    ],
+    "total_duration_sec": 29.75,
+    "target_duration_sec": 30.0,
+    "min_allowed_sec": 24.0,
+    "max_allowed_sec": 30.0,
+    "verdict": "pass",
+    "overflow_sec": 0.0,
+    "shortfall_sec": 0.0
+  },
+  "steps_used": 6,
+  "tool_calls_used": 8
+}

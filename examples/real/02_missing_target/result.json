@@ -1,0 +1,22 @@
+{
+  "status": "needs_input",
+  "message": "原因：目标时长是脚本创作的关键信息，缺失时无法判断分镜数量与旁白密度，需要你确认具体秒数后才能开始写。；缺少信息：target_duration_sec；需要确认：这条关于「剪刀鱼字幕功能」的抖音短视频，你希望成片时长是多少秒？（例如 15 秒、30 秒、60 秒）",
+  "mode": "real",
+  "title": null,
+  "shots": null,
+  "total_duration_sec": null,
+  "target_duration_sec": null,
+  "source_ids": [],
+  "checks": {
+    "duration": "not_run",
+    "rules": "not_run"
+  },
+  "risks": [],
+  "missing_info": [
+    "target_duration_sec"
+  ],
+  "unverified_draft": null,
+  "last_estimate": null,
+  "steps_used": 1,
+  "tool_calls_used": 1
+}

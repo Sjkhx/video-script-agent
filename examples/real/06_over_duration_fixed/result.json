@@ -1,0 +1,68 @@
+{
+  "status": "completed",
+  "message": "脚本已通过时长与规则检查，共 3 个分镜，预计总时长 11.0 秒。",
+  "mode": "real",
+  "title": "剪刀鱼三点：字幕模板配音",
+  "shots": [
+    {
+      "id": 1,
+      "visual": "手机屏幕里新手对着剪辑界面抱头，镜头快速推近",
+      "narration": "新手做视频？就记三点。",
+      "claims": [],
+      "duration_sec": 2.75,
+      "source_ids": []
+    },
+    {
+      "id": 2,
+      "visual": "镜头三连切：字幕条弹出；竖屏模板网格滑动；配音音色列表滚动",
+      "narration": "字幕支持，模板 30 套竖屏，配音 12 种中文音色。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        },
+        {
+          "source_id": "P02",
+          "quote": "提供 30 套竖屏模板"
+        },
+        {
+          "source_id": "P04",
+          "quote": "提供 12 种中文配音音色"
+        }
+      ],
+      "duration_sec": 5.0,
+      "source_ids": [
+        "P01",
+        "P02",
+        "P04"
+      ]
+    },
+    {
+      "id": 3,
+      "visual": "剪辑界面完成度条拉满，出品牌字卡",
+      "narration": "剪刀鱼，剪出属于你的故事。",
+      "claims": [],
+      "duration_sec": 3.25,
+      "source_ids": []
+    }
+  ],
+  "total_duration_sec": 11.0,
+  "target_duration_sec": 12.0,
+  "source_ids": [
+    "P01",
+    "P02",
+    "P04"
+  ],
+  "checks": {
+    "duration": "pass",
+    "rules": "pass"
+  },
+  "risks": [
+    "标题与旁白只陈述素材事实，未做效果承诺；若需强调“新手零门槛”“自动识别配音”等说法，需补充对应素材"
+  ],
+  "missing_info": [],
+  "unverified_draft": null,
+  "last_estimate": null,
+  "steps_used": 4,
+  "tool_calls_used": 6
+}

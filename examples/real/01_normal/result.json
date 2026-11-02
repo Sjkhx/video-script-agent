@@ -1,0 +1,110 @@
+{
+  "status": "completed",
+  "message": "脚本已通过时长与规则检查，共 6 个分镜，预计总时长 26.75 秒。",
+  "mode": "real",
+  "title": "剪刀鱼的字幕功能｜新手速览",
+  "shots": [
+    {
+      "id": 1,
+      "visual": "新手对着手机发愁，屏幕上是还没加字幕的草稿画面",
+      "narration": "新手做短视频，最容易卡在哪一步？",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 4.0,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 2,
+      "visual": "屏幕示意：视频画面下方出现一行字幕文字，手指在屏幕上对时间",
+      "narration": "很多人会说：加字幕，对时间对到眼花。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 4.25,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 3,
+      "visual": "手机里打开剪刀鱼，画面停在字幕相关的位置（示意画面，可用色块标注）",
+      "narration": "那剪刀鱼呢？素材里写得很直白：支持字幕。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 4.75,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 4,
+      "visual": "作者坐在桌前，边比划边说，语气轻松",
+      "narration": "对新手来说，先确认有这个功能，再决定怎么用。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 5.25,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 5,
+      "visual": "手写便签写着“字幕”两个字，旁边画一个勾",
+      "narration": "别急，画面先拍清楚，字幕慢慢对。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 3.75,
+      "source_ids": [
+        "P01"
+      ]
+    },
+    {
+      "id": 6,
+      "visual": "对镜头收尾，比一个关注手势，屏幕角落出现关注引导条",
+      "narration": "这条先聊到这。剪刀鱼，剪出属于你的故事。",
+      "claims": [],
+      "duration_sec": 4.75,
+      "source_ids": []
+    }
+  ],
+  "total_duration_sec": 26.75,
+  "target_duration_sec": 30.0,
+  "source_ids": [
+    "P01"
+  ],
+  "checks": {
+    "duration": "pass",
+    "rules": "pass"
+  },
+  "risks": [
+    "本次检索只拿到 1 条素材 P01，仅有事实「支持字幕」；脚本未涉及自动识别、字幕样式、准确率等任何具体能力，因此内容偏“确认功能存在”，深度有限。",
+    "画面中的剪刀鱼界面、字幕位置为示意拍摄，实际界面需按 App 真实情况替换或打码处理。",
+    "如需讲清操作步骤或效果对比，需补充对应素材后再扩写。"
+  ],
+  "missing_info": [],
+  "unverified_draft": null,
+  "last_estimate": null,
+  "steps_used": 6,
+  "tool_calls_used": 8
+}
