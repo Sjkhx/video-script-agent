@@ -1,0 +1,111 @@
+import json
+
+import pytest
+
+from script_agent.models import AgentResult
+from script_agent.trace import TraceRecorder, summarize_observation
+
+
+@pytest.mark.parametrize("action,observation,expected", [
+    ("search_materials", {"ok": True, "count": 1, "materials": [{"id": "P01"}]}, "命中 1 条: P01"),
+    ("search_materials", {"ok": True, "count": 0, "materials": []}, "命中 0 条"),
+    ("estimate_duration", {"ok": True, "total_duration_sec": 37.5, "target_duration_sec": 30.0, "verdict": "too_long", "overflow_sec": 7.5, "shortfall_sec": 0.0}, "总时长 37.5s，目标 30s，判定 too_long，超出 7.5s"),
+    ("check_rules", {"ok": True, "verdict": "pass", "violations": []}, "判定 pass"),
+    ("check_rules", {"ok": True, "verdict": "fail", "violations": [{"code": "MISSING_CLOSING_SLOGAN"}, {"code": "UNSUPPORTED_TERM"}]}, "判定 fail: MISSING_CLOSING_SLOGAN, UNSUPPORTED_TERM"),
+])
+def test_summaries(action, observation, expected):
+    assert summarize_observation(action, observation) == expected
+
+
+def test_error_summary_contains_code():
+    summary = summarize_observation("check_rules", {"ok": False, "error": {"code": "TOOL_UNAVAILABLE", "message": "暂不可用"}})
+    assert "TOOL_UNAVAILABLE" in summary
+
+
+@pytest.mark.parametrize("action", [
+    "search_materials", "estimate_duration", "check_rules",
+    "submit_script", "ask_user", "report_failure", "unknown_tool",
+])
+@pytest.mark.parametrize("observation", [
+    {}, {"ok": True}, {"ok": False}, {"ok": False, "error": "boom"},
+    {"ok": True, "count": None, "materials": None},
+    {"ok": True, "verdict": "fail", "violations": [{}]},
+])
+def test_missing_fields_never_raise(action, observation):
+    assert isinstance(summarize_observation(action, observation), str)
+
+
+def test_finish_backfills_next_action_and_writes_files(tmp_path):
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={"topic": "字幕"}, fault=None, max_steps=10, max_tool_calls=20)
+    for seq, action in enumerate(["search_materials", "submit_script"], 1):
+        t.step(round=seq, seq=seq, action=action, args={}, observation={"ok": True, "count": 0, "materials": []}, decision_note="依据", injected_fault=False, usage={"prompt_tokens": 1, "completion_tokens": 1})
+    t.finish(AgentResult(status="completed", message="完成", mode="mock", steps_used=2, tool_calls_used=2))
+    lines = [json.loads(x) for x in (tmp_path / "trace.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert [x["type"] for x in lines] == ["run_start", "step", "step", "run_end"]
+    assert lines[1]["next_action"] == "submit_script"
+    assert lines[2]["next_action"] == "END:completed"
+    assert lines[3]["total_tokens"] == 4
+    assert "search_materials" in (tmp_path / "trace.md").read_text(encoding="utf-8")
+
+
+def test_run_start_and_note_records(tmp_path):
+    t = TraceRecorder(
+        tmp_path, mode="real", model="m", request={"topic": "字幕", "target_duration_sec": 30.0},
+        fault={"tool": "estimate_duration", "times": 1}, max_steps=10, max_tool_calls=20,
+    )
+    t.step(round=1, seq=1, action="search_materials", args={"query": "字幕"}, observation={"ok": True, "count": 0, "materials": []}, decision_note="先检索", injected_fault=False, usage={"prompt_tokens": 1, "completion_tokens": 1})
+    t.note(round=2, event="no_action", detail="模型只回复了文字")
+    t.finish(AgentResult(status="incomplete", message="达到步数上限", mode="real", steps_used=2, tool_calls_used=1))
+    lines = [json.loads(x) for x in (tmp_path / "trace.jsonl").read_text(encoding="utf-8").splitlines()]
+    start = lines[0]
+    assert start["type"] == "run_start"
+    assert start["run_id"] and start["started_at"]
+    assert start["mode"] == "real" and start["model"] == "m"
+    assert start["request"] == {"topic": "字幕", "target_duration_sec": 30.0}
+    assert start["fault"] == {"tool": "estimate_duration", "times": 1}
+    assert (start["max_steps"], start["max_tool_calls"]) == (10, 20)
+    note = [x for x in lines if x["type"] == "note"][0]
+    assert (note["round"], note["event"], note["detail"]) == (2, "no_action", "模型只回复了文字")
+    assert lines[-1]["status"] == "incomplete"
+
+
+def test_usage_is_counted_once_per_round(tmp_path):
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={}, fault=None, max_steps=10, max_tool_calls=20)
+    usage = {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5}
+    # 同一轮的两次工具调用共享同一份 usage，只能计一次。
+    for seq in (1, 2):
+        t.step(round=1, seq=seq, action="search_materials", args={}, observation={"ok": True, "count": 0, "materials": []}, decision_note="同轮", injected_fault=False, usage=usage)
+    t.step(round=2, seq=3, action="search_materials", args={}, observation={"ok": True, "count": 0, "materials": []}, decision_note="下一轮", injected_fault=False, usage={"prompt_tokens": 1, "completion_tokens": 1})
+    t.finish(AgentResult(status="completed", message="完成", mode="mock", steps_used=2, tool_calls_used=3))
+    lines = [json.loads(x) for x in (tmp_path / "trace.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert lines[-1]["total_tokens"] == 7
+
+
+def test_trace_omits_model_internal_fields_and_keys(tmp_path):
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={"topic": "字幕"}, fault=None, max_steps=10, max_tool_calls=20)
+    t.step(
+        round=1,
+        seq=1,
+        action="search_materials",
+        args={"query": "字幕", "reasoning_content": "内部推理", "api_key": "sk-test-should-not-leak"},
+        observation={"ok": True, "count": 1, "materials": [{"id": "P01"}], "reasoning_content": "内部推理"},
+        decision_note="看到素材",
+        injected_fault=False,
+        usage={"prompt_tokens": 1, "completion_tokens": 1},
+    )
+    t.finish(AgentResult(status="completed", message="完成", mode="mock", steps_used=1, tool_calls_used=1))
+    text = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    assert "reasoning_content" not in text and "内部推理" not in text
+    assert "sk-test-should-not-leak" not in text
+    assert "看到素材" in text
+
+
+def test_trace_md_shows_only_title_and_shot_count_for_script_args(tmp_path):
+    t = TraceRecorder(tmp_path, mode="mock", model="scripted", request={}, fault=None, max_steps=10, max_tool_calls=20)
+    shots = [{"id": i, "visual": "画面内容不该出现", "narration": "旁白内容不该出现"} for i in range(1, 5)]
+    t.step(round=1, seq=1, action="estimate_duration", args={"title": "静音也能看懂", "shots": shots}, observation={"ok": True, "total_duration_sec": 30.0, "target_duration_sec": 30.0, "verdict": "pass", "overflow_sec": 0.0, "shortfall_sec": 0.0}, decision_note="初稿", injected_fault=False, usage={})
+    t.finish(AgentResult(status="completed", message="完成", mode="mock", steps_used=1, tool_calls_used=1))
+    md = (tmp_path / "trace.md").read_text(encoding="utf-8")
+    assert all(column in md for column in ["步骤", "动作", "关键参数", "返回摘要", "下一步", "决策依据"])
+    assert "静音也能看懂" in md and "分镜" in md and "4" in md
+    assert "画面内容不该出现" not in md and "旁白内容不该出现" not in md
