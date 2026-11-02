@@ -66,7 +66,11 @@ def _cell(value: object) -> str:
 
 
 def _claims_text(claims: list) -> str:
-    parts = [f"{claim.source_id}：{_flat(claim.quote)}" for claim in claims]
+    """每个引用写成“来源 ID：原文”，原文里的竖线要转义，否则会撑破表格。"""
+    parts = [
+        f"{_flat(claim.source_id)}：{_flat(claim.quote).replace('|', '\\|')}"
+        for claim in claims
+    ]
     return "<br>".join(parts) or "—"
 
 
