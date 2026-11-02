@@ -1,6 +1,6 @@
 {
   "status": "failed",
-  "message": "脚本已完成：时长检查通过（总时长 29.75 秒，目标 30 秒，verdict=pass），产品事实仅引用素材 P01 的「支持字幕」。但规则检查工具 check_rules 连续两次返回 TOOL_UNAVAILABLE，第二次 retries_left=0，无法取得规则检查结论。按流程只有同一份脚本的时长与规则检查同时通过才能提交，因此本次无法交付已验收脚本。；未满足的要求：品牌规则与素材来源检查未完成（check_rules 工具不可用）；脚本未通过 submit_script 正式提交",
+  "message": "脚本已成型且时长检查通过（estimate_duration：总时长 29.0 秒，目标 30 秒，判定 pass），但规则检查工具 check_rules 连续两次返回 TOOL_UNAVAILABLE，重试次数已耗尽（retries_left=0），无法按要求完成品牌规则与素材来源校验，因此不能调用 submit_script 提交。另外本次素材检索只命中 1 条极简素材（P01：facts「支持字幕」），产品事实非常有限，脚本里只做了“支持字幕”这一句产品表述，没有写任何素材未覆盖的功能、步骤、数字或效果。；未满足的要求：check_rules 校验未通过（工具不可用，重试耗尽），脚本无法提交；素材仅「支持字幕」一条事实，无法展开字幕功能的操作步骤、样式或识别效果等细节",
   "mode": "real",
   "title": null,
   "shots": null,
@@ -14,24 +14,30 @@
   "risks": [],
   "missing_info": [],
   "unverified_draft": {
-    "title": "剪刀鱼字幕功能｜新手30秒上手",
+    "title": "新手第一条短视频，先学会加字幕",
     "shots": [
       {
         "id": 1,
-        "visual": "手机屏幕特写：时间轴上画面都排好了，字幕轨道却是空的，创作者抓头",
-        "narration": "新手剪第一条视频，最怕的不是没素材，而是字幕。",
+        "visual": "手机竖屏自拍，新手博主对镜头笑，头顶弹出问号",
+        "narration": "刚做短视频，最容易忽略的是字幕。",
         "claims": []
       },
       {
         "id": 2,
-        "visual": "逐字输入字幕，来回暂停播放对时间点，屏幕反光映出疲惫的脸",
-        "narration": "一句一句敲，还得对着时间轴反复调，眼睛都要花了。",
+        "visual": "手指刷抖音，屏幕角落亮起静音图标",
+        "narration": "很多人刷视频时，根本没开声音。",
         "claims": []
       },
       {
         "id": 3,
-        "visual": "打开剪刀鱼，界面推进到字幕相关入口，手指点了一下",
-        "narration": "后来才知道，剪刀鱼是支持字幕的，这一块终于不用自己硬扛。",
+        "visual": "画面没有文字，观众手指一划就滑走",
+        "narration": "听不见内容，人家就先划走了。",
+        "claims": []
+      },
+      {
+        "id": 4,
+        "visual": "剪刀鱼操作界面录制，素材轨上叠出字幕条",
+        "narration": "剪刀鱼支持字幕，新手也能直接用上。",
         "claims": [
           {
             "source_id": "P01",
@@ -40,15 +46,21 @@
         ]
       },
       {
-        "id": 4,
-        "visual": "先把画面剪顺、节奏卡上，再回头看字幕，进度条一点点往前走",
-        "narration": "先把画面和节奏剪顺，字幕再一点点磨，步骤清楚就不慌。",
+        "id": 5,
+        "visual": "成片画面里文字随旁白出现，重点词被标亮",
+        "narration": "把话打到画面上，重点一眼就看得见。",
         "claims": []
       },
       {
-        "id": 5,
-        "visual": "正面出镜微笑，手机举在胸前，画面打出“字幕安排明白”字样",
-        "narration": "你也来试试，第一条视频，从把字幕安排明白开始。",
+        "id": 6,
+        "visual": "博主对着镜头摊手，画面轻快",
+        "narration": "第一支别追完美，能发出去就已经赢了。",
+        "claims": []
+      },
+      {
+        "id": 7,
+        "visual": "成片播放完毕，出现关注按钮动画",
+        "narration": "字幕先加好，想看更多剪辑技巧就点关注。",
         "claims": []
       }
     ]
@@ -58,31 +70,41 @@
     "shots": [
       {
         "id": 1,
-        "units": 20,
-        "duration_sec": 5.5
+        "units": 14,
+        "duration_sec": 4.0
       },
       {
         "id": 2,
-        "units": 21,
-        "duration_sec": 5.75
+        "units": 13,
+        "duration_sec": 3.75
       },
       {
         "id": 3,
-        "units": 25,
-        "duration_sec": 6.75
+        "units": 12,
+        "duration_sec": 3.5
       },
       {
         "id": 4,
-        "units": 23,
-        "duration_sec": 6.25
+        "units": 15,
+        "duration_sec": 4.25
       },
       {
         "id": 5,
-        "units": 20,
-        "duration_sec": 5.5
+        "units": 15,
+        "duration_sec": 4.25
+      },
+      {
+        "id": 6,
+        "units": 16,
+        "duration_sec": 4.5
+      },
+      {
+        "id": 7,
+        "units": 17,
+        "duration_sec": 4.75
       }
     ],
-    "total_duration_sec": 29.75,
+    "total_duration_sec": 29.0,
     "target_duration_sec": 30.0,
     "min_allowed_sec": 24.0,
     "max_allowed_sec": 30.0,

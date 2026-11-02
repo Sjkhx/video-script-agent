@@ -2,14 +2,11 @@
 
 | 步骤 | 动作 | 关键参数 | 返回摘要 | 下一步 | 决策依据 |
 |---:|---|---|---|---|---|
-| 1 | search_materials | query=剪刀鱼 字幕功能 自动字幕；top_k=8 | 命中 1 条: P01 | search_materials | 需求为剪刀鱼字幕功能，先检索产品素材核实可写事实 |
-| 2 | search_materials | query=剪刀鱼 视频剪辑 字幕 效率 新手；top_k=8 | 命中 1 条: P01 | search_materials | 素材过少，换查询再找字幕相关事实 |
-| 3 | search_materials | query=剪刀鱼 剪辑软件 功能介绍；top_k=10 | 命中 0 条 | estimate_duration | 两次仅命中同一素材，最后换词再试一次 |
-| 4 | estimate_duration | 标题=30秒看懂剪刀鱼的字幕功能（新手版）；分镜=7 | 总时长 29.25s，目标 30s，判定 pass | check_rules | 素材仅有一条事实，先估时长看是否接近30秒 |
-| 5 | check_rules | 标题=30秒看懂剪刀鱼的字幕功能（新手版）；分镜=7 | 判定 fail: UNSUPPORTED_NUMBER, UNCITED_FEATURE, MISSING_CLOSING_SLOGAN | search_materials | 同步检查规则，确认未支持的80%说法是否需删除 |
-| 6 | search_materials | query=剪刀鱼 竖屏 抖音；top_k=8 | 命中 1 条: P02 | estimate_duration | 规则提示存在 P02「竖屏」标签，检索确认其事实 |
-| 7 | estimate_duration | 标题=新手必看：剪刀鱼的字幕功能速览；分镜=6 | 总时长 24.75s，目标 30s，判定 pass | check_rules | 按规则加引用与品牌语、去数字，重估时长 |
-| 8 | check_rules | 标题=新手必看：剪刀鱼的字幕功能速览；分镜=6 | 判定 pass | estimate_duration | 同步复检引用完整性、数字与结尾品牌语 |
-| 9 | estimate_duration | 标题=新手必看：剪刀鱼的字幕功能速览；分镜=6 | 总时长 27.5s，目标 30s，判定 pass | check_rules | 已通过但仅24.75秒，补充开场铺垫更贴近30秒 |
-| 10 | check_rules | 标题=新手必看：剪刀鱼的字幕功能速览；分镜=6 | 判定 pass | submit_script | 修改后重新检查完整脚本规则 |
-| 11 | submit_script | 标题=新手必看：剪刀鱼的字幕功能速览；分镜=6 | 提交通过 | END:completed | 时长27.5秒与规则检查均通过，提交同一份脚本 |
+| 1 | search_materials | query=剪刀鱼 字幕功能 自动字幕；top_k=6 | 命中 1 条: P01 | search_materials | 关键信息齐全，先检索产品素材以获取字幕功能事实 |
+| 2 | search_materials | query=剪刀鱼 效率提升 80% 剪辑；top_k=6 | 命中 0 条 | search_materials | 素材仅“支持字幕”，再查效率提升相关素材以核实80%说法 |
+| 3 | search_materials | query=剪刀鱼 数据 提速 效率 字幕识别；top_k=6 | 命中 1 条: P01 | estimate_duration | 效率素材无结果，换查询核实80%数据出处 |
+| 4 | estimate_duration | 标题=剪刀鱼字幕功能｜新手第一条视频怎么剪（30秒）；分镜=6 | 总时长 39.75s，目标 30s，判定 too_long，超出 9.75s | check_rules | 素材仅"支持字幕"一条，据此写6镜初稿并同时做时长与规则检查 |
+| 5 | check_rules | 标题=剪刀鱼字幕功能｜新手第一条视频怎么剪（30秒）；分镜=6 | 判定 fail: TITLE_TOO_LONG, BANNED_TERM, UNSUPPORTED_NUMBER, UNCITED_FEATURE, MISSING_CLOSING_SLOGAN | estimate_duration | 同稿送检，确认80%等无素材支持的表述未写入 |
+| 6 | estimate_duration | 标题=剪刀鱼剪辑，新手也能顺手出片；分镜=5 | 总时长 24.75s，目标 30s，判定 pass | check_rules | 初稿39.75s过long且规则fail，压缩为5镜重检 |
+| 7 | check_rules | 标题=剪刀鱼剪辑，新手也能顺手出片；分镜=5 | 判定 pass | submit_script | 同稿送检，已删禁用词与无依据数字，末镜加品牌语 |
+| 8 | submit_script | 标题=剪刀鱼剪辑，新手也能顺手出片；分镜=5 | 提交通过 | END:completed | 同一份脚本时长24.75s通过且规则pass，直接提交 |

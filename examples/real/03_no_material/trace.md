@@ -2,7 +2,7 @@
 
 | 步骤 | 动作 | 关键参数 | 返回摘要 | 下一步 | 决策依据 |
 |---:|---|---|---|---|---|
-| 1 | search_materials | query=剪刀鱼 直播推流 功能；top_k=8 | 命中 0 条 | search_materials | 主题明确为剪刀鱼直播推流功能，先检索素材再写脚本 |
-| 2 | search_materials | query=剪刀鱼 直播 推流 一键开播；top_k=8 | 命中 0 条 | search_materials | 首查0结果，换产品名+推流直播相关词再试 |
-| 3 | search_materials | query=剪刀鱼；top_k=10 | 命中 0 条 | ask_user | 第二次检索仍为0，最后一次换更宽泛的产品关键词 |
-| 4 | ask_user | missing_fields=["materials"]；questions=["请提供“剪刀鱼”直播推流功能的素材（如功能说明、支持平台、操作步骤、画质/延迟等官方描述），或告知素材库中的正确产…；reason=已用“剪刀鱼 直播推流 功能”“剪刀鱼 直播 推流 一键开播”“剪刀鱼”三次不同检索，素材库均无命中。脚本里的产品事实… | 已请求用户补充信息 | END:needs_input | 三次不同检索均返回0条素材，无法核实产品事实 |
+| 1 | search_materials | query=剪刀鱼 直播推流；top_k=8 | 命中 0 条 | search_materials | 主题为剪刀鱼直播推流，先检索产品素材 |
+| 2 | search_materials | query=剪刀鱼 直播 功能 教程；top_k=8 | 命中 0 条 | search_materials | 首次检索零结果，换查询词重试 |
+| 3 | search_materials | query=剪刀鱼 剪映 推流 直播伴侣；top_k=10 | 命中 0 条 | ask_user | 两次零结果，第三次换更宽泛查询 |
+| 4 | ask_user | missing_fields=["materials"]；questions=["我在素材库里没检索到“剪刀鱼”的任何资料（试过「剪刀鱼 直播推流」「剪刀鱼 直播 功能 教程」「剪刀鱼 剪映 推流…；reason=脚本中的产品事实只能来自本次检索返回的素材，当前素材为空，无法在保证不虚构的前提下写出直播推流脚本。 | 已请求用户补充信息 | END:needs_input | 三次不同检索均无素材，无法写产品事实 |
