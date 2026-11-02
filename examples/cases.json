@@ -1,0 +1,122 @@
+[
+  {
+    "name": "01_normal",
+    "input": "examples/inputs/01_normal.json",
+    "fault": null,
+    "data_dir": "data",
+    "covers": "正常生成、参考实例",
+    "expect": {
+      "status": ["completed"],
+      "must_cite": ["P01"],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "02_missing_target",
+    "input": "examples/inputs/02_missing_target.json",
+    "fault": null,
+    "data_dir": "data",
+    "covers": "缺关键信息",
+    "expect": {
+      "status": ["needs_input"],
+      "must_cite": [],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "03_no_material",
+    "input": "examples/inputs/03_no_material.json",
+    "fault": null,
+    "data_dir": "data",
+    "covers": "无素材、改写查询后请求补充",
+    "expect": {
+      "status": ["needs_input"],
+      "must_cite": [],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "04_tool_fail_transient",
+    "input": "examples/inputs/04_tool_fail_transient.json",
+    "fault": {"tool": "estimate_duration", "times": 1},
+    "data_dir": "data",
+    "covers": "工具失败后恢复",
+    "expect": {
+      "status": ["completed"],
+      "must_cite": ["P01"],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "05_tool_fail_permanent",
+    "input": "examples/inputs/05_tool_fail_permanent.json",
+    "fault": {"tool": "check_rules", "times": -1},
+    "data_dir": "data",
+    "covers": "工具失败、明确失败",
+    "expect": {
+      "status": ["failed"],
+      "must_cite": [],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "06_over_duration_fixed",
+    "input": "examples/inputs/06_over_duration_fixed.json",
+    "fault": null,
+    "data_dir": "data",
+    "covers": "超时长后修正",
+    "expect": {
+      "status": ["completed"],
+      "must_cite": ["P01", "P02", "P04"],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "07_over_duration_infeasible",
+    "input": "examples/inputs/07_over_duration_infeasible.json",
+    "fault": null,
+    "data_dir": "data",
+    "covers": "超时长、明确失败",
+    "expect": {
+      "status": ["failed"],
+      "must_cite": [],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "08_rule_conflict",
+    "input": "examples/inputs/08_rule_conflict.json",
+    "fault": null,
+    "data_dir": "data",
+    "covers": "规则风险、不编造",
+    "expect": {
+      "status": ["completed", "needs_input", "failed"],
+      "must_cite": [],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "09_query_rewrite",
+    "input": "examples/inputs/09_query_rewrite.json",
+    "fault": null,
+    "data_dir": "data",
+    "covers": "改写查询",
+    "expect": {
+      "status": ["completed", "needs_input"],
+      "must_cite": [],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  },
+  {
+    "name": "10_materials_changed",
+    "input": "examples/inputs/10_materials_changed.json",
+    "fault": null,
+    "data_dir": "examples/data_variants/no_subtitle",
+    "covers": "改检索结果后动作变化",
+    "expect": {
+      "status": ["needs_input"],
+      "must_cite": [],
+      "forbid_text": ["80%", "效率", "效率提升"]
+    }
+  }
+]
