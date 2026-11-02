@@ -130,7 +130,7 @@ def _clip(text: Any, limit: int = 80) -> str:
 def _redact_text(text: str, secrets: Iterable[str] = ()) -> str:
     """先按已知密钥字面量替换，再处理 sk- 样式；两处都要做。"""
     redacted = text
-    for secret in secrets:
+    for secret in _secret_tuple(secrets):
         if secret:
             redacted = redacted.replace(secret, "***")
     return _KEY_PATTERN.sub("sk-***", redacted)
@@ -138,7 +138,7 @@ def _redact_text(text: str, secrets: Iterable[str] = ()) -> str:
 
 def _clip_redacted(text: Any, limit: int, secrets: Iterable[str] = ()) -> str:
     """先脱敏再截断：反过来会把跨截断点的密钥切出残片，残片不再匹配任何规则。"""
-    return _clip(_redact_text(str(text), secrets), limit)
+    return _clip(_redact_text(str(text), _secret_tuple(secrets)), limit)
 
 
 def _clean(value: Any, secrets: Iterable[str] = ()) -> Any:
@@ -193,10 +193,18 @@ def _usage_total(usage: dict) -> int:
     return _int(usage.get("total_tokens"))
 
 
+def _secret_tuple(secrets: Iterable[str]) -> tuple[str, ...]:
+    """单个 str 按一个密钥处理，否则会被逐字符拆开；长的先替换避免残片。"""
+    if isinstance(secrets, str):
+        secrets = (secrets,)
+    return tuple(sorted({str(item) for item in secrets if item}, key=len, reverse=True))
+
+
 def summarize_observation(
     action: str, observation: dict, secrets: Iterable[str] = ()
 ) -> str:
     """把一次工具观察压成一句中文摘要；字段缺失时返回占位，绝不抛异常。"""
+    secrets = _secret_tuple(secrets)
     obs = observation if isinstance(observation, dict) else {}
 
     if obs.get("ok") is False:
@@ -208,7 +216,7 @@ def summarize_observation(
             code = str(error) if error else "UNKNOWN_ERROR"
             message = None
         if isinstance(message, str) and message.strip():
-            return f"错误 {code}: {message.strip()}"
+            return f"错误 {code}: {_clip_redacted(message.strip(), 200, secrets)}"
         return f"错误 {code}"
 
     if action == "search_materials":
@@ -370,9 +378,8 @@ class TraceRecorder:
         ):
             self._usage_by_round[round_no] = usage_dict
         # 摘要会同时进 jsonl 和 md，必须和 result 一样脱敏；它来自原始 observation。
-        summary = _redact_text(
-            summarize_observation(str(action), observation), self._secrets
-        )
+        # secrets 必须传进去：摘要内部先截断再返回，出来后再脱敏已经来不及。
+        summary = summarize_observation(str(action), observation, self._secrets)
         record = {
             "type": "step",
             "round": round_no,

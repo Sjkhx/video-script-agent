@@ -234,3 +234,39 @@ def test_bare_string_secrets_is_treated_as_one_literal(tmp_path):
     # 周围文本不能被逐字符打星。
     assert "请求使用" in jsonl and "调用失败" in jsonl
     assert "h***" not in jsonl and "*" * 5 not in jsonl
+
+
+def test_error_message_secret_is_redacted_even_within_length_limit(tmp_path):
+    """错误信息没超长也要脱敏：不走截断分支不代表安全。"""
+    secret = "plainerrormessagesecret9876"
+    t = TraceRecorder(
+        tmp_path, mode="real", model="m", request={}, fault=None,
+        max_steps=10, max_tool_calls=20, secrets=[secret],
+    )
+    t.step(
+        round=1, seq=1, action="check_rules", args={},
+        observation={"ok": False, "error": {"code": "TOOL_EXCEPTION", "message": f"内部错误 {secret}"}},
+        decision_note="工具异常", injected_fault=False, usage={},
+    )
+    t.finish(AgentResult(status="failed", message="失败", mode="real", steps_used=1, tool_calls_used=1))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    md = (tmp_path / "trace.md").read_text(encoding="utf-8")
+    assert secret not in jsonl and secret not in md
+    assert "TOOL_EXCEPTION" in jsonl
+
+
+def test_summary_secret_straddling_clip_boundary_is_redacted(tmp_path):
+    """summary 内部先截断，密钥跨 80 字边界时也不能漏出前段。"""
+    secret = "zzboundarysecret54321"
+    t = TraceRecorder(
+        tmp_path, mode="real", model="m", request={}, fault=None,
+        max_steps=10, max_tool_calls=20, secrets=secret,
+    )
+    t.step(
+        round=1, seq=1, action="something_else", args={},
+        observation={"ok": True, "message": "填" * 78 + secret},
+        decision_note="其它", injected_fault=False, usage={},
+    )
+    t.finish(AgentResult(status="completed", message="完成", mode="real", steps_used=1, tool_calls_used=1))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    assert secret[:6] not in jsonl
