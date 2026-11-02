@@ -202,3 +202,35 @@ def test_non_dict_args_raw_string_is_redacted(tmp_path):
     jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
     md = (tmp_path / "trace.md").read_text(encoding="utf-8")
     assert key not in jsonl and key not in md
+
+
+def test_note_redacts_secret_straddling_clip_boundary(tmp_path):
+    secret = "plainboundarysecret123456"
+    # 让密钥前半段落在 300 字截断点之内，后半段被切掉；先截后脱敏会漏出残片。
+    filler = "填" * (300 - 5)
+    t = TraceRecorder(
+        tmp_path, mode="real", model="m", request={}, fault=None,
+        max_steps=10, max_tool_calls=20, secrets=[secret],
+    )
+    t.note(round=1, event="boundary", detail=filler + secret)
+    t.finish(AgentResult(status="failed", message="失败", mode="real", steps_used=1, tool_calls_used=0))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    # 不能出现密钥的任何前 4 字符片段。
+    assert secret[:4] not in jsonl
+    assert secret not in jsonl
+
+
+def test_bare_string_secrets_is_treated_as_one_literal(tmp_path):
+    secret = "single-string-secret"
+    t = TraceRecorder(
+        tmp_path, mode="real", model="m", request={}, fault=None,
+        max_steps=10, max_tool_calls=20, secrets=secret,
+    )
+    t.note(round=1, event="string_secret", detail=f"请求使用 {secret} 调用失败")
+    t.finish(AgentResult(status="failed", message="失败", mode="real", steps_used=1, tool_calls_used=0))
+    jsonl = (tmp_path / "trace.jsonl").read_text(encoding="utf-8")
+    md = (tmp_path / "trace.md").read_text(encoding="utf-8")
+    assert secret not in jsonl and secret not in md
+    # 周围文本不能被逐字符打星。
+    assert "请求使用" in jsonl and "调用失败" in jsonl
+    assert "h***" not in jsonl and "*" * 5 not in jsonl

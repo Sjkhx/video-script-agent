@@ -136,6 +136,11 @@ def _redact_text(text: str, secrets: Iterable[str] = ()) -> str:
     return _KEY_PATTERN.sub("sk-***", redacted)
 
 
+def _clip_redacted(text: Any, limit: int, secrets: Iterable[str] = ()) -> str:
+    """先脱敏再截断：反过来会把跨截断点的密钥切出残片，残片不再匹配任何规则。"""
+    return _clip(_redact_text(str(text), secrets), limit)
+
+
 def _clean(value: Any, secrets: Iterable[str] = ()) -> Any:
     """递归复制并去掉模型内部字段、密钥字段，字符串里的密钥也脱敏。"""
     if isinstance(value, dict):
@@ -188,7 +193,9 @@ def _usage_total(usage: dict) -> int:
     return _int(usage.get("total_tokens"))
 
 
-def summarize_observation(action: str, observation: dict) -> str:
+def summarize_observation(
+    action: str, observation: dict, secrets: Iterable[str] = ()
+) -> str:
     """把一次工具观察压成一句中文摘要；字段缺失时返回占位，绝不抛异常。"""
     obs = observation if isinstance(observation, dict) else {}
 
@@ -258,7 +265,8 @@ def summarize_observation(action: str, observation: dict) -> str:
 
     message = obs.get("message")
     if isinstance(message, str) and message.strip():
-        return _clip(message, 80)
+        # 先脱敏再截断，避免密钥跨 80 字边界被切出残片。
+        return _clip_redacted(message, 80, secrets)
     return "完成" if obs.get("ok") else "无结果"
 
 
@@ -311,6 +319,9 @@ class TraceRecorder:
         self._jsonl_path = self.out_dir / "trace.jsonl"
         self._md_path = self.out_dir / "trace.md"
         # 已知密钥字面量：不是 sk- 形状的凭据也能从自由文本里挡掉。
+        # 传单个 str 时按一个密钥处理，否则会被拆成一个个字符。
+        if isinstance(secrets, str):
+            secrets = (secrets,)
         # 长的先替换，避免短密钥是长密钥子串时留下残片。
         self._secrets = tuple(
             sorted({str(item) for item in secrets if item}, key=len, reverse=True)
@@ -388,8 +399,8 @@ class TraceRecorder:
             "type": "note",
             "round": _int(round),
             "event": str(event),
-            # note 的 detail 是自由文本，同样要挡掉密钥样式和已知密钥。
-            "detail": _redact_text(_clip(detail, 300), self._secrets),
+            # note 的 detail 是自由文本；先脱敏再截断，避免密钥跨截断点被切出残片。
+            "detail": _clip_redacted(detail, 300, self._secrets),
         }
         self._notes.append(record)
         self._append(record)
