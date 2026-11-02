@@ -3,7 +3,7 @@ import json
 import pytest
 
 from helpers import DATA_DIR, args, fit_draft
-from script_agent.models import normalize_request
+from script_agent.models import ScriptDraft, draft_hash, normalize_request
 from script_agent.registry import FaultPlan, ToolRegistry
 
 REQUEST = {"topic": "字幕", "target_duration_sec": 30}
@@ -153,3 +153,20 @@ def test_decision_note_length_is_not_validated():
     out = make().execute("search_materials", args(query="字幕", decision_note=note))
     assert out.observation["ok"] is True and out.decision_note == note
     assert "decision_note" not in out.args
+
+
+def test_last_estimate_belongs_to_the_reported_draft():
+    """估算过的草稿和最终报告的草稿不是同一份时，不能把前者的时长挂上去。"""
+    r = make()
+    checked = fit_draft()
+    passed(r, checked)
+    # 换成另一份草稿只做规则检查，last_draft 随之变成这一份。
+    changed = fit_draft()
+    changed["shots"][1]["narration"] = "嗯" * 27 + "哦"
+    r.execute("check_rules", args(**changed))
+    result = r.build_result("failed", mode="mock", steps_used=3, tool_calls_used=4)
+    assert result.unverified_draft is not None
+    assert draft_hash(result.unverified_draft) != draft_hash(
+        ScriptDraft.model_validate(checked)
+    )
+    assert result.last_estimate is None

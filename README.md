@@ -93,7 +93,7 @@ python scripts/run_examples.py
 | 用例 | 复现命令 | 结果路径 | 实际状态 |
 |---|---|---|---|
 | 规则风险、不编造 | `python -m script_agent --input examples/inputs/08_rule_conflict.json` | `examples/real/08_rule_conflict/` | `completed`，脚本没写用户要求的“效率提升 80%”，改到 `risks` 里说明缺数据 |
-| 改写查询 | `python -m script_agent --input examples/inputs/09_query_rewrite.json` | `examples/real/09_query_rewrite/` | `completed`，27.25 秒，仅引用 P01 |
+| 改写查询 | `python -m script_agent --input examples/inputs/09_query_rewrite.json` | `examples/real/09_query_rewrite/` | `completed`，29.5 秒，仅引用 P01 |
 | 改检索结果 | `python -m script_agent --input examples/inputs/10_materials_changed.json --data-dir examples/data_variants/no_subtitle` | `examples/real/10_materials_changed/` | `needs_input`，同一需求换个素材目录后从“能写”变成“无素材” |
 
 **怎么读结果：** `result.json` 是机器可读的最终结果，`script.md` 是可直接编辑的脚本，`trace.md` 是给人看的逐步表格（步骤、动作、关键参数、返回摘要、下一步、决策依据），`trace.jsonl` 是同一份记录的逐行 JSON（含每轮 token 用量）。`summary.json` 是结果索引，`summary.md` 是同一份汇总的表格版。

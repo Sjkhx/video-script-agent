@@ -648,6 +648,12 @@ class ToolRegistry:
             rules=values.get("rules", "not_run"),
         )
 
+    def _estimate_for(self, draft: ScriptDraft | None) -> dict | None:
+        """只返回这份草稿自己的估算结果；草稿换了就不挂别人的时长。"""
+        if draft is None:
+            return None
+        return self._estimates_by_hash.get(draft_hash(draft))
+
     def _ask_message(self) -> str:
         parts: list[str] = []
         if self._ask_reason:
@@ -702,7 +708,7 @@ class ToolRegistry:
             target_duration_sec=self._request.target_duration_sec,
             checks=checks,
             unverified_draft=self._last_draft,
-            last_estimate=self._last_estimate,
+            last_estimate=self._estimate_for(self._last_draft),
             steps_used=steps_used,
             tool_calls_used=tool_calls_used,
         )

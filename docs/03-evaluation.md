@@ -3,7 +3,7 @@
 ## 结论
 
 - 10 个真实模型用例，**两批独立运行，两批 10/10 都达到预期状态**（`examples/real/summary.json` 中 `status_ok` 全为 `true`）。
-- 全量测试 **239 passed，0 skipped，0 failed**（`examples/test-results.txt`，本机复跑同结果）。
+- 全量测试 **240 passed，0 skipped，0 failed**（`examples/test-results.txt`，本机复跑同结果）。
 - 模型：`deepseek-v4.1-flash`，通过 OpenAI 兼容接口调用。
 - 运行时间：第一批 2026-11-02T10:48:13Z 起（commit `bfac6f7`），第二批 2026-11-02T10:54:37Z–11:04:58Z（commit `ae98952`，即当前 `examples/real/` 内容）。日期均为 2026-11-02。
 
@@ -21,10 +21,10 @@
 | 超时长后修正 | `06_over_duration_fixed` | `examples/real/06_over_duration_fixed/` | `completed`，`must_cite=["P01","P02","P04"]` | `completed`，`status_ok=true`，5 步 7 次调用，`total_tokens=22948`；`total_duration_sec=12.0`（目标 12），5 分镜，`checks` 两项 `pass` |
 | 超时长后明确失败 | `07_over_duration_infeasible` | `examples/real/07_over_duration_infeasible/` | `failed` | `failed`，`status_ok=true`，4 步 6 次调用，`total_tokens=14498`；`shots=null`、`total_duration_sec=null`，`last_estimate.verdict=too_long`（3.25 秒 / 目标 3 秒），`checks={duration:too_long, rules:pass}` |
 | 规则风险、不编造 | `08_rule_conflict` | `examples/real/08_rule_conflict/` | `completed` / `needs_input` / `failed` 均可 | `completed`，`status_ok=true`，6 步 8 次调用，`total_tokens=26717`；`total_duration_sec=24.75`，`checks` 两项 `pass`；首条 `risks` 写明“效率提升 80%”无素材来源、未写入脚本 |
-| 改写查询 | `09_query_rewrite` | `examples/real/09_query_rewrite/` | `completed` / `needs_input` 均可 | `completed`，`status_ok=true`，6 步 8 次调用，`total_tokens=26201`；`total_duration_sec=27.25`，仅引用 P01 |
+| 改写查询 | `09_query_rewrite` | `examples/real/09_query_rewrite/` | `completed` / `needs_input` 均可 | `completed`，`status_ok=true`，5 步 8 次调用，`total_tokens=28681`；`total_duration_sec=29.5`，仅引用 P01 |
 | 改检索结果后动作变化 | `10_materials_changed` | `examples/real/10_materials_changed/` | `needs_input` | `needs_input`，`status_ok=true`，4 步 4 次调用，`total_tokens=11442`；3 次检索均 0 条后 `ask_user`，`missing_info=["materials"]` |
 
-`summary.json` 里另有两列值得对照：`model` 全部为 `deepseek-v4.1-flash`，`total_tokens` 合计 215943。首批（`git show bfac6f7:examples/real/summary.json`）同样 10/10 达标，`total_tokens` 合计 236813。
+`summary.json` 里另有两列值得对照：`model` 全部为 `deepseek-v4.1-flash`，`total_tokens` 合计 218423。首批（`git show bfac6f7:examples/real/summary.json`）同样 10/10 达标，`total_tokens` 合计 236813。
 
 每个用例的四个产物：
 
@@ -44,10 +44,10 @@
 ........................................................................ [ 60%]
 ........................................................................ [ 90%]
 .......................                                                  [100%]
-239 passed in 2.45s
+240 passed in 2.14s
 ```
 
-即 **239 passed，0 skipped，0 failed**。本机另跑 `.venv/Scripts/python.exe -m pytest -q` 也是 `239 passed`。其中 `tests/test_examples_consistency.py` 单独运行是 **45 passed**，全部依赖已提交的 `examples/real/`。
+即 **240 passed，0 skipped，0 failed**。本机另跑 `.venv/Scripts/python.exe -m pytest -q` 也是 `240 passed`。其中 `tests/test_examples_consistency.py` 单独运行是 **45 passed**，全部依赖已提交的 `examples/real/`。
 
 分层看：
 
@@ -125,9 +125,11 @@
 | `04_tool_fail_transient` | 10 | 12 | 37390 | 38697 |
 | `06_over_duration_fixed` | 6 | 7 | 20410 | 22948 |
 | `08_rule_conflict` | 11 | 8 | 49231 | 26717 |
-| `09_query_rewrite` | 10 | 8 | 34376 | 26201 |
+| `09_query_rewrite` | 10 | 8 | 34376 | 28681 |
 
-两批的动作序列都不同（例如 `08_rule_conflict` 第一批 11 次调用、第二批 8 次），但状态全部达标。已提交的 `examples/real/` 是第二批。
+两批的动作序列都不同（例如 `08_rule_conflict` 第一批 11 次调用、第二批 8 次），但状态全部达标。
+
+**终审后又重跑了 `09_query_rewrite` 一次。** 原因：第二次运行的 `result.json` 里，模型写的 `risks[1]` 引用了「开了就一路顺」这句旁白，而脚本中并没有这句——属于模型自述文本里的假引用，不是产品事实编造，但提交物里不该留。方案不允许手改 `examples/real/`，所以重跑该用例；当前 `09` 的记录来自这次重跑（5 步 8 次调用，29.5 秒，28681 tokens），其余 9 个用例仍是第二批。
 
 另外：两批的 `trace.jsonl` 里都没有 `GATE_REJECTED`（对 `examples/real/*/trace.jsonl` 逐个 `grep -c`，结果全为 0）。提交把关确实会拒绝“检查后改稿”的情况，但它在单元测试 `tests/test_registry.py::test_changing_draft_after_checks_is_rejected` 和 `test_submit_without_checks_is_rejected` 里被直接验证，两批真实运行恰好都没有触发。
 
@@ -144,6 +146,8 @@
 | 两条新增测试在修复前的提交上也能通过（没有区分力） | 复查测试是否真的能失败 | `9000598 test: cover direct summary redaction paths` |
 | 引用原文里含竖线字符会撑破 `script.md` 的表格 | 渲染时逐行核对竖线数量 | `adfc6fc fix: escape table pipes in claim quotes` |
 | 故障计划是 dataclass，直接传给 `TraceRecorder` 会写成 `fault: null` | 对照实验：直接把 dataclass 传进去，`trace.jsonl` 首行确实是 `null` | 随 `14c20b2 feat: add cli, markdown output and offline mock entry` 一并修正（`app._fault_record`） |
+| `last_estimate` 挂的是“最近一次估算”，可能与 `unverified_draft` 不是同一份草稿 | 终审逐模块核对 `build_result`：先估 A 再查 B 后失败，结果里是 B 的草稿配 A 的时长；先补回归测试 `test_last_estimate_belongs_to_the_reported_draft` 并确认在旧实现上失败 | 终审修复：`registry._estimate_for()` 只返回该草稿自己的估算（`240 passed` 时一并提交） |
+| `09_query_rewrite` 的 `risks` 里引用了脚本中不存在的旁白 | 终审逐条核对 `result.json` 中 `risks` 的引号内容与脚本正文 | 重跑该用例，未手改 `examples/real/` |
 
 ## Mock 边界
 

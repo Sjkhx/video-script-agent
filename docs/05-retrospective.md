@@ -54,7 +54,7 @@
 
 - Trace 与模型客户端完成后（`93a20e8`），全量是 148 passed（`.superpowers/sdd/2026-11-02-video-script-agent/task-7-report.md` 的记录）。
 - Task 10 加入一致性测试、尚未跑真实批次时，离线是 `194 passed, 45 skipped`，跳过原因是“尚未生成真实运行结果”（同目录 `task-10-report.md` 的记录）。
-- 两批真实运行提交后，`examples/test-results.txt` 记录 `239 passed`，无跳过。
+- 两批真实运行提交后，`examples/test-results.txt` 记录 `240 passed`，无跳过。
 
 ### 7. 已知限制未在实现阶段解决
 

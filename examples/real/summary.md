@@ -12,5 +12,5 @@
 | 06_over_duration_fixed | completed | 是 | search_materials -> search_materials -> estimate_duration -> check_rules -> estimate_duration -> check_rules -> submit_script | deepseek-v4.1-flash | 22948 | 超时长后修正 | — |
 | 07_over_duration_infeasible | failed | 是 | search_materials -> estimate_duration -> check_rules -> estimate_duration -> check_rules -> report_failure | deepseek-v4.1-flash | 14498 | 超时长、明确失败 | — |
 | 08_rule_conflict | completed | 是 | search_materials -> search_materials -> search_materials -> estimate_duration -> check_rules -> estimate_duration -> check_rules -> submit_script | deepseek-v4.1-flash | 26717 | 规则风险、不编造 | — |
-| 09_query_rewrite | completed | 是 | search_materials -> search_materials -> search_materials -> estimate_duration -> check_rules -> estimate_duration -> check_rules -> submit_script | deepseek-v4.1-flash | 26201 | 改写查询 | — |
+| 09_query_rewrite | completed | 是 | search_materials -> search_materials -> search_materials -> estimate_duration -> check_rules -> estimate_duration -> check_rules -> submit_script | deepseek-v4.1-flash | 28681 | 改写查询 | — |
 | 10_materials_changed | needs_input | 是 | search_materials -> search_materials -> search_materials -> ask_user | deepseek-v4.1-flash | 11442 | 改检索结果后动作变化 | — |

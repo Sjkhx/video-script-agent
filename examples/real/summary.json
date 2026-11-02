@@ -152,7 +152,7 @@
     ],
     "covers": "改写查询",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 26201
+    "total_tokens": 28681
   },
   {
     "name": "10_materials_changed",

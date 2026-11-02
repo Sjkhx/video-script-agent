@@ -34,7 +34,7 @@
 .venv/Scripts/python.exe -m pytest -q -rs
 ```
 
-结果：`239 passed`。`examples/test-results.txt` 保存的就是这条命令的完整输出（`239 passed in 2.45s`），其中 `-rs` 版本没有 skip 报告，与“0 skipped”一致。
+结果：`240 passed`。`examples/test-results.txt` 保存的就是这条命令的完整输出（`240 passed in 2.14s`），其中 `-rs` 版本没有 skip 报告，与“0 skipped”一致。
 
 **2. 真实运行结果的一致性校验**
 
@@ -70,7 +70,7 @@
 
 **5. 安装可复现性**
 
-在临时目录另建一个干净虚拟环境，按 `requirements.txt` 安装后跑测试，结果同样是 `239 passed`；用该环境的解释器执行上面的离线命令，同样是退出码 0、`script.md` 带 `[MOCK]` 首行。
+在临时目录另建一个干净虚拟环境，按 `requirements.txt` 安装后跑测试，结果同样是 `240 passed`；用该环境的解释器执行上面的离线命令，同样是退出码 0、`script.md` 带 `[MOCK]` 首行。
 
 **6. 配置与安全**
 
