@@ -37,6 +37,12 @@ def test_cited_number_passes():
     claim = [{"source_id": "P03", "quote": "支持导出 1080P"}]
     assert codes(with_narration(1, "支持导出 1080P", claim), {"P01", "P03"}) == set()
 
+def test_shortened_quantity_is_rejected():
+    claim = [{"source_id": "P04", "quote": "提供 12 种中文配音音色"}]
+    assert "UNSUPPORTED_NUMBER" in codes(with_narration(1, "提供 1 种音色", claim), {"P01", "P04"})
+    claim = [{"source_id": "P03", "quote": "支持导出 1080P"}]
+    assert "UNSUPPORTED_NUMBER" in codes(with_narration(1, "支持导出 80P", claim), {"P01", "P03"})
+
 def test_uncited_feature_is_rejected():
     assert {"UNCITED_FEATURE", "UNSUPPORTED_NUMBER"} <= codes(with_narration(1, "支持导出 1080P"))
     assert "UNCITED_FEATURE" in codes(with_narration(1, "字幕很重要"))

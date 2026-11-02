@@ -127,6 +127,12 @@ def _contains_term(folded_text: str, term: str) -> bool:
     return folded_term in folded_text
 
 
+def _contains_number(folded_fact: str, number: str) -> bool:
+    """数字须作为完整数字出现，不能是更长数字串的片段。"""
+    pattern = rf"(?<!\d){re.escape(number)}(?!\d)"
+    return re.search(pattern, folded_fact) is not None
+
+
 def _text_violations(
     catalog: Catalog,
     text: str,
@@ -171,7 +177,7 @@ def _text_violations(
         )
 
     for number in dict.fromkeys(_NUMBER_PATTERN.findall(folded)):
-        if any(number in fact for fact in folded_facts):
+        if any(_contains_number(fact, number) for fact in folded_facts):
             continue
         violations.append(
             {
