@@ -1,0 +1,5 @@
+openai==2.52.0
+pydantic==2.13.4
+python-dotenv==1.0.1
+pytest==9.1.1
+-e .
