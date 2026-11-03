@@ -245,10 +245,39 @@ def check_rules(
             draft.title,
         )
 
+    if not draft.title.strip():
+        add("EMPTY_TEXT", None, "标题不能为空，请写一个标题。", draft.title)
+
     all_cited = {claim.source_id for shot in draft.shots for claim in shot.claims}
     violations.extend(_text_violations(catalog, draft.title, "title", None, all_cited))
 
+    seen_ids: set[int] = set()
     for shot in draft.shots:
+        if shot.id in seen_ids:
+            add(
+                "DUPLICATE_SHOT_ID",
+                shot.id,
+                f"分镜序号 {shot.id} 重复，请给每个分镜不同的序号。",
+                str(shot.id),
+            )
+        seen_ids.add(shot.id)
+        for part in ("visual", "narration"):
+            if not getattr(shot, part).strip():
+                add(
+                    "EMPTY_TEXT",
+                    shot.id,
+                    f"{_PART_LABELS[part]}不能为空，请补充内容或删除这个分镜。",
+                    getattr(shot, part),
+                )
+        # 纯标点也能拿到单镜最短时长，不拦住就可以用空分镜凑时长。
+        if shot.narration.strip() and count_speech_units(shot.narration) == 0:
+            add(
+                "NO_SPEECH",
+                shot.id,
+                "旁白只有标点或符号，没有可读出的文字，请写成完整的句子或删除这个分镜。",
+                shot.narration,
+            )
+
         cited = {claim.source_id for claim in shot.claims}
         for claim in shot.claims:
             material = catalog.material(claim.source_id)

@@ -9,7 +9,6 @@
       "search_materials",
       "estimate_duration",
       "check_rules",
-      "search_materials",
       "estimate_duration",
       "check_rules",
       "estimate_duration",
@@ -18,7 +17,7 @@
     ],
     "covers": "正常生成、参考实例",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 37210
+    "total_tokens": 30794
   },
   {
     "name": "02_missing_target",
@@ -29,7 +28,7 @@
     ],
     "covers": "缺关键信息",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 2701
+    "total_tokens": 2782
   },
   {
     "name": "03_no_material",
@@ -43,7 +42,7 @@
     ],
     "covers": "无素材、改写查询后请求补充",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 11478
+    "total_tokens": 11789
   },
   {
     "name": "04_tool_fail_transient",
@@ -51,21 +50,19 @@
     "status_ok": true,
     "path": [
       "search_materials",
-      "search_materials",
-      "search_materials",
       "estimate_duration",
       "check_rules",
-      "search_materials",
-      "search_materials",
+      "check_rules",
       "estimate_duration",
       "check_rules",
       "estimate_duration",
       "check_rules",
+      "estimate_duration",
       "submit_script"
     ],
     "covers": "工具失败后恢复",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 38697
+    "total_tokens": 34279
   },
   {
     "name": "05_tool_fail_permanent",
@@ -83,14 +80,13 @@
     ],
     "covers": "工具失败、明确失败",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 24051
+    "total_tokens": 24390
   },
   {
     "name": "06_over_duration_fixed",
     "status": "completed",
     "status_ok": true,
     "path": [
-      "search_materials",
       "search_materials",
       "estimate_duration",
       "check_rules",
@@ -100,7 +96,7 @@
     ],
     "covers": "超时长后修正",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 22948
+    "total_tokens": 18221
   },
   {
     "name": "07_over_duration_infeasible",
@@ -112,11 +108,13 @@
       "check_rules",
       "estimate_duration",
       "check_rules",
+      "estimate_duration",
+      "estimate_duration",
       "report_failure"
     ],
     "covers": "超时长、明确失败",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 14498
+    "total_tokens": 23321
   },
   {
     "name": "08_rule_conflict",
@@ -130,11 +128,13 @@
       "check_rules",
       "estimate_duration",
       "check_rules",
+      "estimate_duration",
+      "check_rules",
       "submit_script"
     ],
     "covers": "规则风险、不编造",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 26717
+    "total_tokens": 33364
   },
   {
     "name": "09_query_rewrite",
@@ -152,7 +152,7 @@
     ],
     "covers": "改写查询",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 28681
+    "total_tokens": 25600
   },
   {
     "name": "10_materials_changed",
@@ -166,6 +166,6 @@
     ],
     "covers": "改检索结果后动作变化",
     "model": "deepseek-v4.1-flash",
-    "total_tokens": 11442
+    "total_tokens": 11755
   }
 ]

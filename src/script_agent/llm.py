@@ -123,6 +123,8 @@ class OpenAICompatibleLLM:
             raise LLMError(
                 f"模型返回格式异常：{_redact(str(exc), self._api_key) or type(exc).__name__}"
             ) from exc
+        if message is None:
+            raise LLMError("模型返回格式异常：响应里没有 message。")
 
         tool_calls: list[ToolCall] = []
         raw_tool_calls = getattr(message, "tool_calls", None) or []
@@ -137,7 +139,7 @@ class OpenAICompatibleLLM:
             )
 
         # exclude_none 保留厂商附加字段（如 reasoning_content），也不改动 tool_calls 形状。
-        raw_message = message.model_dump(exclude_none=True)
+        raw_message = _as_plain_dict(message)
         usage = _as_plain_dict(getattr(completion, "usage", None))
         return LLMResponse(
             content=getattr(message, "content", None),

@@ -1,72 +1,80 @@
 {
   "status": "completed",
-  "message": "脚本已通过时长与规则检查，共 5 个分镜，预计总时长 24.75 秒。",
+  "message": "脚本已通过时长与规则检查，共 6 个分镜，预计总时长 26.0 秒。",
   "mode": "real",
-  "title": "剪刀鱼剪辑，新手也能顺手出片",
+  "title": "剪刀鱼字幕功能｜新手入门版",
   "shots": [
     {
       "id": 1,
-      "visual": "手机剪辑界面时间线特写，拇指停在屏幕上",
-      "narration": "新手剪视频，最怕卡在字幕：一句句敲，还要对时间。",
-      "claims": [
-        {
-          "source_id": "P01",
-          "quote": "支持字幕"
-        }
-      ],
-      "duration_sec": 5.5,
-      "source_ids": [
-        "P01"
-      ]
+      "visual": "手机屏幕上播放一段刚拍好的视频，创作者低头看着手机",
+      "narration": "视频拍完了，还差一步。",
+      "claims": [],
+      "duration_sec": 2.75,
+      "source_ids": []
     },
     {
       "id": 2,
-      "visual": "打开剪刀鱼，字幕入口被点亮，镜头轻推",
-      "narration": "剪刀鱼支持字幕，这一步不用你一个人硬扛。",
+      "visual": "镜头推近手机，屏幕上的视频带有字幕",
+      "narration": "剪刀鱼的字幕功能，支持字幕。",
       "claims": [
         {
           "source_id": "P01",
           "quote": "支持字幕"
         }
       ],
-      "duration_sec": 5.0,
+      "duration_sec": 3.5,
       "source_ids": [
         "P01"
       ]
     },
     {
       "id": 3,
-      "visual": "成片画面底部出现字幕，手机调成静音",
-      "narration": "字幕落在画面下方，静音刷也能跟上内容。",
+      "visual": "创作者坐在桌前，手机立在支架上，反复看手机屏幕，表情发愁",
+      "narration": "新手做视频，常常就卡在这一步，越弄越乱，最后干脆不发了。",
+      "claims": [],
+      "duration_sec": 6.5,
+      "source_ids": []
+    },
+    {
+      "id": 4,
+      "visual": "手机屏幕上播放一段视频，画面带有字幕，人物在说话",
+      "narration": "这段视频，画面里带有字幕。",
       "claims": [
         {
           "source_id": "P01",
           "quote": "支持字幕"
         }
       ],
-      "duration_sec": 4.75,
+      "duration_sec": 3.25,
       "source_ids": [
         "P01"
       ]
     },
     {
-      "id": 4,
-      "visual": "桌前：左边是写满字的草稿纸，右边是干净的成片画面",
-      "narration": "先把整条视频跑通，比堆满特效更重要。",
+      "id": 5,
+      "visual": "创作者把手机放下，笑着看向镜头",
+      "narration": "新手阶段，先挑一个用得上的功能，把视频发出去。",
       "claims": [],
-      "duration_sec": 4.5,
+      "duration_sec": 5.5,
       "source_ids": []
     },
     {
-      "id": 5,
-      "visual": "博主对镜头比手势，屏幕出现关注按钮与品牌语",
-      "narration": "关注我少走弯路，剪刀鱼，剪出属于你的故事。",
-      "claims": [],
-      "duration_sec": 5.0,
-      "source_ids": []
+      "id": 6,
+      "visual": "手机屏幕上的视频带有字幕，画面定格出现在收藏提示旁",
+      "narration": "这条先收藏，剪刀鱼，剪出属于你的故事。",
+      "claims": [
+        {
+          "source_id": "P01",
+          "quote": "支持字幕"
+        }
+      ],
+      "duration_sec": 4.5,
+      "source_ids": [
+        "P01"
+      ]
     }
   ],
-  "total_duration_sec": 24.75,
+  "total_duration_sec": 26.0,
   "target_duration_sec": 30.0,
   "source_ids": [
     "P01"
@@ -76,13 +84,13 @@
     "rules": "pass"
   },
   "risks": [
-    "用户要求写明“效率提升 80%”，但本次检索素材仅有“支持字幕”一条事实，无任何效率/百分比数据来源，因此脚本未写入该说法，需补充官方数据素材后才能加入。",
-    "素材仅支持“支持字幕”这一功能点，自动识别、识别准确率、一键成片等延伸功能均未写入。",
-    "时长为24.75秒，落在允许区间但不足30秒目标值，如需更贴近30秒可在真实素材到位后补充细节。"
+    "用户风格要求「必须写明效率提升80%」缺乏素材支持：本次检索仅命中 P01「支持字幕」，无任何效率或百分比数据，故脚本未写入 80%，建议补充相关素材后再加。",
+    "素材事实极少（仅「支持字幕」），脚本中涉及产品的旁白与画面均只做字面表达，未展示界面细节或操作步骤，成片可能信息量偏低。",
+    "分镜 1/3/5 为场景与提问，不含产品事实；如需更具体的功能卖点，请补充素材。"
   ],
   "missing_info": [],
   "unverified_draft": null,
   "last_estimate": null,
-  "steps_used": 6,
-  "tool_calls_used": 8
+  "steps_used": 7,
+  "tool_calls_used": 10
 }

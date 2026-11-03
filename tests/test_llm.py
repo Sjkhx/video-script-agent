@@ -41,6 +41,12 @@ def test_parses_tool_calls_and_keeps_provider_fields():
     assert client.kwargs["model"] == "m"
 
 
+def test_missing_message_becomes_llm_error():
+    response = SimpleNamespace(choices=[SimpleNamespace(message=None)], usage=None)
+    with pytest.raises(LLMError, match="返回格式异常"):
+        OpenAICompatibleLLM("m", client=StubClient(response)).complete([], [])
+
+
 def test_client_sends_tools_and_tool_choice():
     client = StubClient(completion({"role": "assistant", "content": "你好"}))
     tools = [{"type": "function", "function": {"name": "search_materials"}}]

@@ -2,11 +2,11 @@
 
 | 步骤 | 动作 | 关键参数 | 返回摘要 | 下一步 | 决策依据 |
 |---:|---|---|---|---|---|
-| 1 | search_materials | query=剪刀鱼 字幕功能；top_k=8 | 命中 1 条: P01 | search_materials | 关键信息齐全，先检索剪刀鱼字幕素材 |
-| 2 | search_materials | query=剪刀鱼 语音识别 自动生成字幕 文字样式；top_k=8 | 命中 1 条: P01 | search_materials | 仅1条且极简，换查询补充字幕相关事实 |
-| 3 | search_materials | query=剪刀鱼 剪辑 视频 新手 教程；top_k=8 | 命中 0 条 | estimate_duration | 素材仅"支持字幕"一条，再试宽泛查询看有无其他可讲功能 |
-| 4 | estimate_duration | 标题=新手第一条短视频，先学会加字幕；分镜=7 | 总时长 33.75s，目标 30s，判定 too_long，超出 3.75s | check_rules | 素材仅"支持字幕"，先按7镜写30秒稿并测时长 |
-| 5 | check_rules | 标题=新手第一条短视频，先学会加字幕；分镜=7 | 错误 TOOL_UNAVAILABLE: 工具 check_rules 当前不可用，请稍后重试。 | estimate_duration | 同步做规则检查，确认仅一处产品事实且引用原文 |
-| 6 | estimate_duration | 标题=新手第一条短视频，先学会加字幕；分镜=7 | 总时长 29s，目标 30s，判定 pass | check_rules | 33.75秒超时，压缩旁白后重估；同时重试规则检查 |
-| 7 | check_rules | 标题=新手第一条短视频，先学会加字幕；分镜=7 | 错误 TOOL_UNAVAILABLE: 工具 check_rules 当前不可用，请稍后重试。 | report_failure | 上一轮规则工具不可用，此处重试完整脚本 |
-| 8 | report_failure | reason=脚本已成型且时长检查通过（estimate_duration：总时长 29.0 秒，目标 30 秒，判定 pass），…；unmet_requirements=["check_rules 校验未通过（工具不可用，重试耗尽），脚本无法提交", "素材仅「支持字幕」一条事实，无法展…；failed_tools=["check_rules"] | 已报告无法满足要求 | END:failed | check_rules 两次返回不可用且 retries_left=0，无法完成规则校验 |
+| 1 | search_materials | query=剪刀鱼 字幕功能；top_k=5 | 命中 1 条: P01 | search_materials | 需求关键信息齐全，先检索字幕功能素材 |
+| 2 | search_materials | query=剪刀鱼 App 视频剪辑 字幕 功能；top_k=8 | 命中 1 条: P01 | search_materials | 仅得一条素材，换宽泛查询再补素材 |
+| 3 | search_materials | query=字幕 自动识别 剪辑工具 新手；top_k=8 | 命中 1 条: P01 | estimate_duration | 两次结果相同，最后一次换查询确认素材上限 |
+| 4 | estimate_duration | 标题=新手拍第一条视频，别有压力；分镜=7 | 总时长 34s，目标 30s，判定 too_long，超出 4s | check_rules | 素材仅“支持字幕”，据此写30秒新手向脚本 |
+| 5 | check_rules | 标题=新手拍第一条视频，别有压力；分镜=7 | 错误 TOOL_UNAVAILABLE: 工具 check_rules 当前不可用，请稍后重试。 | estimate_duration | 素材仅一句事实，先查规则确认表述合规 |
+| 6 | estimate_duration | 标题=新手拍第一条视频，别有压力；分镜=7 | 总时长 28.75s，目标 30s，判定 pass | check_rules | 返回 too_long 4秒，压缩各镜旁白 |
+| 7 | check_rules | 标题=新手拍第一条视频，别有压力；分镜=7 | 错误 TOOL_UNAVAILABLE: 工具 check_rules 当前不可用，请稍后重试。 | report_failure | 重试上次不可用的 check_rules，校验压缩后脚本 |
+| 8 | report_failure | reason=脚本已写好并压缩到 28.75 秒（30 秒目标，判定 pass），但品牌规则与素材来源检查工具 check_rule…；unmet_requirements=["脚本未经 check_rules 品牌规则与素材来源检查，不能提交"]；failed_tools=["check_rules"] | 已报告无法满足要求 | END:failed | check_rules 两次不可用且 retries_left=0，无法完成校验 |

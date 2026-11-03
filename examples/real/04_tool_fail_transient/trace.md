@@ -2,15 +2,13 @@
 
 | 步骤 | 动作 | 关键参数 | 返回摘要 | 下一步 | 决策依据 |
 |---:|---|---|---|---|---|
-| 1 | search_materials | query=剪刀鱼 字幕功能；top_k=8 | 命中 1 条: P01 | search_materials | 主题是剪刀鱼字幕功能，先检索相关素材 |
-| 2 | search_materials | query=剪刀鱼 视频剪辑 自动识别语音生成字幕；top_k=8 | 命中 1 条: P01 | search_materials | 仅命中1条极简素材，换关键词补充检索 |
-| 3 | search_materials | query=剪刀鱼 剪辑软件 功能介绍 上手；top_k=10 | 命中 0 条 | estimate_duration | 第二次仍只有P01，最后换查询再试一次 |
-| 4 | estimate_duration | 标题=新手剪视频别忽略字幕｜剪刀鱼字幕功能；分镜=6 | 错误 TOOL_UNAVAILABLE: 工具 estimate_duration 当前不可用，请稍后重试。 | check_rules | 素材仅P01，先按现有事实排6镜估时长 |
-| 5 | check_rules | 标题=新手剪视频别忽略字幕｜剪刀鱼字幕功能；分镜=6 | 判定 fail: UNCITED_FEATURE, MISSING_CLOSING_SLOGAN | search_materials | 与估时长同轮检查规则合规性 |
-| 6 | search_materials | query=剪刀鱼 竖屏 比例；top_k=5 | 命中 1 条: P02 | search_materials | 规则提示P02含“竖屏”，需检索确认其事实 |
-| 7 | search_materials | query=剪刀鱼 字幕 竖屏 抖音；top_k=10 | 命中 2 条: P01, P02 | estimate_duration | 估计时长工具不可用，先补齐素材再重试 |
-| 8 | estimate_duration | 标题=新手剪视频，别省掉字幕这一步｜剪刀鱼；分镜=6 | 总时长 32.5s，目标 30s，判定 too_long，超出 2.5s | check_rules | 已修正字幕引用与结尾品牌语，重估时长 |
-| 9 | check_rules | 标题=新手剪视频，别省掉字幕这一步｜剪刀鱼；分镜=6 | 判定 fail: UNSUPPORTED_TERM | estimate_duration | 同步对修正后脚本做规则检查 |
-| 10 | estimate_duration | 标题=新手剪视频，别省掉字幕这一步｜剪刀鱼；分镜=6 | 总时长 26s，目标 30s，判定 pass | check_rules | 上版32.5秒超长且有未支持词，压缩旁白并删“同步” |
-| 11 | check_rules | 标题=新手剪视频，别省掉字幕这一步｜剪刀鱼；分镜=6 | 判定 pass | submit_script | 同步重查规则：已删“同步”一词 |
-| 12 | submit_script | 标题=新手剪视频，别省掉字幕这一步｜剪刀鱼；分镜=6 | 提交通过 | END:completed | 时长与规则均pass，提交同一份脚本 |
+| 1 | search_materials | query=剪刀鱼 字幕功能；top_k=5 | 命中 1 条: P01 | estimate_duration | 主题是剪刀鱼字幕功能，先检索对应素材 |
+| 2 | estimate_duration | 标题=剪刀鱼的字幕功能｜新手30秒版；分镜=7 | 错误 TOOL_UNAVAILABLE: 工具 estimate_duration 当前不可用，请稍后重试。 | check_rules | 按素材仅“支持字幕”写好初稿，先看时长判定 |
+| 3 | check_rules | 标题=剪刀鱼的字幕功能｜新手30秒版；分镜=7 | 判定 fail: UNSUPPORTED_NUMBER, UNCITED_FEATURE, MISSING_CLOSING_SLOGAN | check_rules | 同步跑规则检查，确认事实引用与表述合规 |
+| 4 | check_rules | 标题=剪刀鱼的字幕功能｜新手友好版；分镜=7 | 错误 INVALID_ARGS: 参数校验失败：shots.6.id: Field required | estimate_duration | 按 violations 改标题、去掉未引用提及并补品牌语 |
+| 5 | estimate_duration | 标题=剪刀鱼的字幕功能｜新手友好版；分镜=7 | 错误 INVALID_ARGS: 参数校验失败：shots.6.id: Field required | check_rules | 规则检查已改稿，同时重试估算时长 |
+| 6 | check_rules | 标题=剪刀鱼的字幕功能｜新手友好版；分镜=7 | 判定 fail: UNSUPPORTED_TERM | estimate_duration | 补上分镜 7 的 id 后重跑规则检查 |
+| 7 | estimate_duration | 标题=剪刀鱼的字幕功能｜新手友好版；分镜=7 | 总时长 31.75s，目标 30s，判定 too_long，超出 1.75s | check_rules | 补上分镜 7 的 id 后重跑时长估算 |
+| 8 | check_rules | 标题=剪刀鱼的字幕功能｜新手友好版；分镜=7 | 判定 pass | estimate_duration | 删除“轻松”并压缩旁白后重跑规则检查 |
+| 9 | estimate_duration | 标题=剪刀鱼的字幕功能｜新手友好版；分镜=7 | 总时长 25.5s，目标 30s，判定 pass | submit_script | 压缩旁白以消除 1.75 秒超时 |
+| 10 | submit_script | 标题=剪刀鱼的字幕功能｜新手友好版；分镜=7 | 提交通过 | END:completed | check_rules 通过且时长 25.5 秒达标，提交同一份脚本 |

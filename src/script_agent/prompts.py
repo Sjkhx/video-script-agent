@@ -6,7 +6,7 @@ import json
 
 from .models import ScriptRequest, missing_required
 
-# 原样来自 task-8 brief：故意不写语速和品牌语，模型只能从工具结果得知这些信息。
+# 故意不写语速和品牌语，模型只能从工具结果得知这些信息。
 SYSTEM_PROMPT = """你是短视频脚本 Agent，为创作者产出可编辑的短视频脚本。你只能通过调用工具行动，每一轮都根据最新的工具结果决定下一步。
 
 动作：
@@ -19,7 +19,7 @@ SYSTEM_PROMPT = """你是短视频脚本 Agent，为创作者产出可编辑的�
 
 必须遵守：
 1. 主题和目标时长是关键信息。任一缺失或无效时调用 ask_user，不要猜。受众、平台、风格缺失时可按通用设定写。
-2. 产品事实只能来自本次 search_materials 返回的素材。写到产品事实的分镜要填 claims：source_id 写素材 ID，quote 逐字引用 facts 原文。不得写素材没有的功能、数字、效果或对比。场景描写和提问可以不带 claims，但不能暗示产品能力。
+2. 产品事实只能来自本次 search_materials 返回的素材。写到产品事实的分镜要填 claims：source_id 写素材 ID，quote 逐字引用 facts 原文。不得写素材没有的功能、数字、效果或对比。涉及产品的旁白和画面只能表达 quote 的字面意思：素材写“支持字幕”，就只能说支持字幕，不能引申出字幕怎么生成、放在哪里、如何跟随声音，也不能说省事、好用、不用动手。画面不要展示素材没提到的界面细节和操作过程，用“屏幕上的视频带有字幕”这样的概括描述。场景描写和提问可以不带 claims，但不能暗示产品能力。
 3. 检索无结果时，换一个不同的查询再试，最多再试 2 次。仍无结果时调用 ask_user，missing_fields 填 materials。
 4. 每次修改脚本后，都要对修改后的完整脚本重新调用 estimate_duration 和 check_rules，两者都通过后提交同一份脚本。建议在同一轮同时调用这两个工具。
 5. estimate_duration 返回 too_long 时压缩旁白或合并分镜，返回 too_short 时补充不含新事实的内容。目标时长是用户的硬性要求，你不能修改。确认无法满足时调用 report_failure，在 unmet_requirements 写明差距；调用前必须已有 estimate_duration 的结果作为依据。

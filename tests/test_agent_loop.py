@@ -144,3 +144,7 @@ def test_message_protocol_for_parallel_calls(tmp_path):
 def test_prompt_does_not_leak_tool_only_knowledge():
     assert SLOGAN not in SYSTEM_PROMPT
     assert "每秒" not in SYSTEM_PROMPT
+
+
+def test_prompt_limits_product_claims_to_the_literal_quote():
+    assert "字面意思" in SYSTEM_PROMPT and "界面细节" in SYSTEM_PROMPT

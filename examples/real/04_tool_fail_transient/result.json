@@ -1,94 +1,88 @@
 {
   "status": "completed",
-  "message": "脚本已通过时长与规则检查，共 6 个分镜，预计总时长 26.0 秒。",
+  "message": "脚本已通过时长与规则检查，共 7 个分镜，预计总时长 25.5 秒。",
   "mode": "real",
-  "title": "新手剪视频，别省掉字幕这一步｜剪刀鱼",
+  "title": "剪刀鱼的字幕功能｜新手友好版",
   "shots": [
     {
       "id": 1,
-      "visual": "手机录制画面：新手剪完视频，手指悬在发布键上停住",
-      "narration": "视频剪完就想点发布？先等一下。",
+      "visual": "博主坐在桌前对镜头说话，桌上有手机支架和小本子",
+      "narration": "刚开始做短视频的朋友，常卡在同一件事上。",
+      "claims": [],
+      "duration_sec": 5.0,
+      "source_ids": []
+    },
+    {
+      "id": 2,
+      "visual": "屏幕上播放一段画面单调的视频",
+      "narration": "刷到这样的片段，你会一秒划走吗？",
+      "claims": [],
+      "duration_sec": 4.0,
+      "source_ids": []
+    },
+    {
+      "id": 3,
+      "visual": "新手对着屏幕皱眉、手托下巴",
+      "narration": "轮到自己动手，更想问：它行不行？",
       "claims": [],
       "duration_sec": 3.75,
       "source_ids": []
     },
     {
-      "id": 2,
-      "visual": "博主对镜头说话，手在屏幕下方比划一条横条的位置",
-      "narration": "抖音上很多人是静音刷的，字幕别省。",
-      "claims": [
-        {
-          "source_id": "P01",
-          "quote": "支持字幕"
-        }
-      ],
-      "duration_sec": 4.25,
-      "source_ids": [
-        "P01"
-      ]
-    },
-    {
-      "id": 3,
-      "visual": "剪刀鱼操作界面示意，镜头停在字幕相关区域，光标点一下",
-      "narration": "剪刀鱼支持字幕，加字幕它能帮你搞定。",
-      "claims": [
-        {
-          "source_id": "P01",
-          "quote": "支持字幕"
-        }
-      ],
-      "duration_sec": 4.5,
-      "source_ids": [
-        "P01"
-      ]
-    },
-    {
       "id": 4,
-      "visual": "博主快语速举例，画面下方出现文字条",
-      "narration": "说话快、带口音，有字幕观众才跟得上。",
+      "visual": "屏幕上的视频带有字幕",
+      "narration": "答案很直接：剪刀鱼支持字幕。",
       "claims": [
         {
           "source_id": "P01",
           "quote": "支持字幕"
         }
       ],
-      "duration_sec": 4.25,
+      "duration_sec": 3.5,
       "source_ids": [
         "P01"
       ]
     },
     {
       "id": 5,
-      "visual": "手机屏幕对比示意：文字条分别置于画面上方和下方",
-      "narration": "字幕放哪都行，别挡住画面重点。",
+      "visual": "屏幕上的视频带有字幕，镜头缓慢推近",
+      "narration": "就四个字——支持字幕。",
       "claims": [
         {
           "source_id": "P01",
           "quote": "支持字幕"
         }
       ],
-      "duration_sec": 3.75,
+      "duration_sec": 2.5,
       "source_ids": [
         "P01"
       ]
     },
     {
       "id": 6,
-      "visual": "博主对镜头招手，屏幕弹出提问文字，最后定格品牌语字幕",
-      "narration": "你剪视频会打字幕吗？剪刀鱼，剪出属于你的故事。",
+      "visual": "新手点头，把这句话写在小本子上",
+      "narration": "下次有人问，直接答：支持字幕。",
       "claims": [
         {
           "source_id": "P01",
           "quote": "支持字幕"
         }
       ],
-      "duration_sec": 5.5,
+      "duration_sec": 3.5,
       "source_ids": [
         "P01"
       ]
+    },
+    {
+      "id": 7,
+      "visual": "镜头回到博主，微笑收尾",
+      "narration": "剪刀鱼，剪出属于你的故事。",
+      "claims": [],
+      "duration_sec": 3.25,
+      "source_ids": []
     }
   ],
-  "total_duration_sec": 26.0,
+  "total_duration_sec": 25.5,
   "target_duration_sec": 30.0,
   "source_ids": [
     "P01"
@@ -98,13 +92,12 @@
     "rules": "pass"
   },
   "risks": [
-    "素材仅支持「支持字幕」这一条事实，脚本没有写自动识别语音、字幕样式数量、准确率等能力，演示镜头仅作画面示意",
-    "按口径实际时长为26.0秒，低于30秒目标但落在允许区间内",
-    "想强调的具体功能点（如一键识别、字幕模板数量）暂无素材支持，需补充素材后再加"
+    "本次素材只返回一条事实「支持字幕」，脚本因此未展开字幕的生成方式、位置、样式或操作步骤；若需要这些细节，需补充对应素材。",
+    "目标时长 30 秒，实际 25.5 秒，落在工具允许区间内但略短于目标值。"
   ],
   "missing_info": [],
   "unverified_draft": null,
   "last_estimate": null,
-  "steps_used": 8,
-  "tool_calls_used": 12
+  "steps_used": 6,
+  "tool_calls_used": 10
 }

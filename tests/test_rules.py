@@ -29,6 +29,47 @@ def test_source_rules():
 def test_reference_case_rejects_invented_effect():
     assert {"UNSUPPORTED_NUMBER", "UNSUPPORTED_TERM"} <= codes(with_narration(1, "效率提升80%"))
 
+# 前三批真实运行或探测里出现过的说法：素材 P01 只写了“支持字幕”，这些都超出了原文。
+@pytest.mark.parametrize("text", [
+    "字幕放哪都行，别挡住画面重点。",
+    "加字幕它能帮你搞定。",
+    "字幕跟着人声逐句出现。",
+    "这款产品的字幕能自己生成。",
+    "说一句话就能变成字幕，再也不用手打。",
+    "比其他软件好用得多，字幕更准。",
+    "这一步不用你一个人硬扛。",
+])
+def test_invented_capability_in_narration_is_rejected(text):
+    assert "UNSUPPORTED_TERM" in codes(with_narration(0, text, [dict(CLAIM_P01)]))
+
+def test_invented_capability_in_visual_is_rejected():
+    draft = fit_draft()
+    draft["shots"][0]["visual"] = "文字跟着人声逐句出现"
+    assert "UNSUPPORTED_TERM" in codes(draft)
+
+def test_invented_effect_in_title_is_rejected():
+    assert "UNSUPPORTED_TERM" in codes(fit_draft(title="新手也能顺手出片"))
+
+def test_scene_description_still_passes():
+    assert codes(with_narration(1, "刷视频时，你是不是经常静音？")) == set()
+
+@pytest.mark.parametrize("field", ["title", "visual", "narration"])
+def test_blank_text_is_rejected(field):
+    draft = fit_draft()
+    if field == "title":
+        draft["title"] = "   "
+    else:
+        draft["shots"][1][field] = "   "
+    assert "EMPTY_TEXT" in codes(draft)
+
+def test_punctuation_only_narration_cannot_pad_duration():
+    assert "NO_SPEECH" in codes(with_narration(1, "。。。"))
+
+def test_duplicate_shot_ids_are_rejected():
+    draft = fit_draft()
+    draft["shots"][1]["id"] = draft["shots"][0]["id"]
+    assert "DUPLICATE_SHOT_ID" in codes(draft)
+
 @pytest.mark.parametrize("text", ["提高８０％", "快了三倍", "百分之八十的人"])
 def test_number_variants_are_rejected(text):
     assert "UNSUPPORTED_NUMBER" in codes(with_narration(1, text))

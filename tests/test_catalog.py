@@ -8,6 +8,13 @@ from script_agent.catalog import DataError, load_catalog
 DATA = Path(__file__).resolve().parents[1] / "data"
 
 
+def test_variant_uses_the_same_rules_and_duration():
+    variant = DATA.parent / "examples" / "data_variants" / "no_subtitle"
+    default = load_catalog(DATA)
+    changed = load_catalog(variant)
+    assert changed.rules == default.rules and changed.duration == default.duration
+
+
 def test_load_catalog_has_reference_material():
     c = load_catalog(DATA)
     assert c.material("P01").facts == ["支持字幕"]

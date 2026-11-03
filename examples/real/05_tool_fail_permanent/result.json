@@ -1,6 +1,6 @@
 {
   "status": "failed",
-  "message": "脚本已成型且时长检查通过（estimate_duration：总时长 29.0 秒，目标 30 秒，判定 pass），但规则检查工具 check_rules 连续两次返回 TOOL_UNAVAILABLE，重试次数已耗尽（retries_left=0），无法按要求完成品牌规则与素材来源校验，因此不能调用 submit_script 提交。另外本次素材检索只命中 1 条极简素材（P01：facts「支持字幕」），产品事实非常有限，脚本里只做了“支持字幕”这一句产品表述，没有写任何素材未覆盖的功能、步骤、数字或效果。；未满足的要求：check_rules 校验未通过（工具不可用，重试耗尽），脚本无法提交；素材仅「支持字幕」一条事实，无法展开字幕功能的操作步骤、样式或识别效果等细节",
+  "message": "脚本已写好并压缩到 28.75 秒（30 秒目标，判定 pass），但品牌规则与素材来源检查工具 check_rules 连续两次返回 TOOL_UNAVAILABLE，重试次数已用尽（retries_left=0）。由于 check_rules 未通过，submit_script 无法接受该脚本，任务无法完成交付。；未满足的要求：脚本未经 check_rules 品牌规则与素材来源检查，不能提交",
   "mode": "real",
   "title": null,
   "shots": null,
@@ -14,30 +14,36 @@
   "risks": [],
   "missing_info": [],
   "unverified_draft": {
-    "title": "新手第一条短视频，先学会加字幕",
+    "title": "新手拍第一条视频，别有压力",
     "shots": [
       {
         "id": 1,
-        "visual": "手机竖屏自拍，新手博主对镜头笑，头顶弹出问号",
-        "narration": "刚做短视频，最容易忽略的是字幕。",
+        "visual": "手机支架前，新手对着镜头有点紧张，手不知道往哪放。",
+        "narration": "第一次拍短视频，是不是还没开口就先紧张？",
         "claims": []
       },
       {
         "id": 2,
-        "visual": "手指刷抖音，屏幕角落亮起静音图标",
-        "narration": "很多人刷视频时，根本没开声音。",
+        "visual": "同一个人反复删掉重拍，叹气。",
+        "narration": "拍完还得自己剪，头大吧。",
         "claims": []
       },
       {
         "id": 3,
-        "visual": "画面没有文字，观众手指一划就滑走",
-        "narration": "听不见内容，人家就先划走了。",
+        "visual": "手指在手机信息流上慢慢往下滑。",
+        "narration": "刷抖音的时候，多看看别人的画面怎么安排。",
         "claims": []
       },
       {
         "id": 4,
-        "visual": "剪刀鱼操作界面录制，素材轨上叠出字幕条",
-        "narration": "剪刀鱼支持字幕，新手也能直接用上。",
+        "visual": "信息流里几条视频依次划过，每条视频的画面上都带着字幕。",
+        "narration": "你会发现，很多视频的画面上都带着字幕。",
+        "claims": []
+      },
+      {
+        "id": 5,
+        "visual": "屏幕上的一条视频带有字幕，画面安静呈现。",
+        "narration": "顺便说一句，剪刀鱼支持字幕。",
         "claims": [
           {
             "source_id": "P01",
@@ -46,21 +52,15 @@
         ]
       },
       {
-        "id": 5,
-        "visual": "成片画面里文字随旁白出现，重点词被标亮",
-        "narration": "把话打到画面上，重点一眼就看得见。",
-        "claims": []
-      },
-      {
         "id": 6,
-        "visual": "博主对着镜头摊手，画面轻快",
-        "narration": "第一支别追完美，能发出去就已经赢了。",
+        "visual": "新手重新架好手机，按下录制键，露出笑容。",
+        "narration": "新手别着急，先把第一条视频做完。",
         "claims": []
       },
       {
         "id": 7,
-        "visual": "成片播放完毕，出现关注按钮动画",
-        "narration": "字幕先加好，想看更多剪辑技巧就点关注。",
+        "visual": "博主人像，镜头前轻松提问，画面留出评论引导。",
+        "narration": "你最近在拍什么？评论区聊聊。",
         "claims": []
       }
     ]
@@ -70,41 +70,41 @@
     "shots": [
       {
         "id": 1,
-        "units": 14,
-        "duration_sec": 4.0
+        "units": 18,
+        "duration_sec": 5.0
       },
       {
         "id": 2,
-        "units": 13,
-        "duration_sec": 3.75
+        "units": 10,
+        "duration_sec": 3.0
       },
       {
         "id": 3,
+        "units": 18,
+        "duration_sec": 5.0
+      },
+      {
+        "id": 4,
+        "units": 17,
+        "duration_sec": 4.75
+      },
+      {
+        "id": 5,
         "units": 12,
         "duration_sec": 3.5
       },
       {
-        "id": 4,
-        "units": 15,
-        "duration_sec": 4.25
-      },
-      {
-        "id": 5,
-        "units": 15,
-        "duration_sec": 4.25
-      },
-      {
         "id": 6,
-        "units": 16,
-        "duration_sec": 4.5
+        "units": 14,
+        "duration_sec": 4.0
       },
       {
         "id": 7,
-        "units": 17,
-        "duration_sec": 4.75
+        "units": 12,
+        "duration_sec": 3.5
       }
     ],
-    "total_duration_sec": 29.0,
+    "total_duration_sec": 28.75,
     "target_duration_sec": 30.0,
     "min_allowed_sec": 24.0,
     "max_allowed_sec": 30.0,

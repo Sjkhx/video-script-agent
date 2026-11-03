@@ -1,105 +1,81 @@
 {
   "status": "completed",
-  "message": "脚本已通过时长与规则检查，共 6 个分镜，预计总时长 25.5 秒。",
+  "message": "脚本已通过时长与规则检查，共 5 个分镜，预计总时长 26.0 秒。",
   "mode": "real",
-  "title": "剪刀鱼字幕功能｜新手口播加字幕",
+  "title": "新手剪片别漏字幕，剪刀鱼这一点先记住",
   "shots": [
     {
       "id": 1,
-      "visual": "手机屏幕正静音播放短视频，画面下方字条跟着滚动",
-      "narration": "静音刷视频，画面下方有字才看得懂。",
+      "visual": "手持手机，屏幕上是一段刚拍好的短视频",
+      "narration": "刚开始剪短视频，最容易卡住的一步，不是剪画面，而是总觉得差了点什么。",
       "claims": [],
-      "duration_sec": 4.25,
+      "duration_sec": 8.0,
       "source_ids": []
     },
     {
       "id": 2,
-      "visual": "切到自拍回放，只有人脸在说话，屏幕下方空空的",
-      "narration": "轮到自己拍，口播想变成文字，就卡住了。",
+      "visual": "屏幕上播放的视频画面完整、光线正常",
+      "narration": "画面看着挺完整，可就是觉得，好像不太对。",
       "claims": [],
-      "duration_sec": 4.5,
+      "duration_sec": 4.75,
       "source_ids": []
     },
     {
       "id": 3,
-      "visual": "手机打开剪刀鱼，镜头停在字幕相关入口（示意画面）",
-      "narration": "剪刀鱼支持字幕，这事不用绕远路。",
+      "visual": "屏幕上播放的视频带有字幕",
+      "narration": "别想太复杂，剪刀鱼支持字幕。",
       "claims": [
         {
           "source_id": "P01",
           "quote": "支持字幕"
         }
       ],
-      "duration_sec": 4.0,
+      "duration_sec": 3.5,
       "source_ids": [
         "P01"
       ]
     },
     {
       "id": 4,
-      "visual": "模板列表向下滑动，竖版模板缩略图依次出现",
-      "narration": "还提供 30 套竖屏模板，照着套就行。",
-      "claims": [
-        {
-          "source_id": "P02",
-          "quote": "提供 30 套竖屏模板"
-        }
-      ],
-      "duration_sec": 4.0,
-      "source_ids": [
-        "P02"
-      ]
-    },
-    {
-      "id": 5,
-      "visual": "导出设置界面，清晰度选项被点击",
-      "narration": "导出 1080P，发出去也够清楚。",
-      "claims": [
-        {
-          "source_id": "P03",
-          "quote": "支持导出 1080P"
-        }
-      ],
-      "duration_sec": 3.5,
-      "source_ids": [
-        "P03"
-      ]
-    },
-    {
-      "id": 6,
-      "visual": "成品画面收尾，屏幕下方出现关注引导贴纸",
-      "narration": "先把字幕跑通一次。剪刀鱼，剪出属于你的故事。",
+      "visual": "屏幕上播放的视频带有字幕，画面停在字幕那一帧",
+      "narration": "就这一点，先记在脑子里。",
       "claims": [
         {
           "source_id": "P01",
           "quote": "支持字幕"
         }
       ],
-      "duration_sec": 5.25,
+      "duration_sec": 3.0,
       "source_ids": [
         "P01"
       ]
+    },
+    {
+      "id": 5,
+      "visual": "人出镜对镜头说话，背景是手机里的视频画面",
+      "narration": "先把这一点记住，再去剪你的视频。剪刀鱼，剪出属于你的故事。",
+      "claims": [],
+      "duration_sec": 6.75,
+      "source_ids": []
     }
   ],
-  "total_duration_sec": 25.5,
+  "total_duration_sec": 26.0,
   "target_duration_sec": 30.0,
   "source_ids": [
-    "P01",
-    "P02",
-    "P03"
+    "P01"
   ],
   "checks": {
     "duration": "pass",
     "rules": "pass"
   },
   "risks": [
-    "本次检索到的字幕素材只有 P01「支持字幕」一条事实，因此脚本未提及自动识别、语音转字幕、字幕样式/修改等能力，也未说明操作步骤细节；如需这些内容请补充素材。",
-    "“剪刀鱼”品牌方可能要求演示真实界面，分镜3/4/5的界面画面仅为示意，需按最终App版本实拍替换。",
-    "目标时长30秒，当前估算25.5秒，在允许区间内但略短，可现场加长口播或停顿补足。"
+    "本次检索仅命中一条素材，产品事实只有「支持字幕」，因此脚本无法展开字幕的生成方式、位置、跟随等细节，也不能提剪辑效率、易用性等卖点。",
+    "实际时长 26 秒，短于目标 30 秒但在允许区间内；若需严格补足到 30 秒，建议补充更多产品素材后再扩写。",
+    "用户若期望出现「自动生成字幕」「字幕样式」等具体说法，目前缺少素材支持，未写入脚本。"
   ],
   "missing_info": [],
   "unverified_draft": null,
   "last_estimate": null,
   "steps_used": 7,
-  "tool_calls_used": 11
+  "tool_calls_used": 10
 }
