@@ -119,19 +119,18 @@
 
 输入 `examples/inputs/06_over_duration_fixed.json`：主题“给新手讲清剪刀鱼的字幕、模板和配音三个卖点”，目标 12 秒。
 
-`examples/real/06_over_duration_fixed/trace.md` 记录的七步（这里按 Trace 的 `seq` 编号，与实际工具调用次数一致）：
+`examples/real/06_over_duration_fixed/trace.md` 记录的六步（这里按 Trace 的 `seq` 编号，与实际工具调用次数一致）：
 
 | 步骤 | 动作 | 返回摘要 | 下一步 | 决策依据（模型自述） |
 |---:|---|---|---|---|
-| 1 | search_materials | 命中 3 条: P01, P02, P04 | search_materials | 主题涉及字幕、模板、配音三个卖点，先检索产品素材 |
-| 2 | search_materials | 命中 2 条: P02, P04 | estimate_duration | 现有3条素材事实较简略，换词补检细节 |
-| 3 | estimate_duration | 总时长 15s，目标 12s，判定 too_long，超出 3s | check_rules | 按三条素材事实写成5镜口语脚本，先验证12秒时长 |
-| 4 | check_rules | 判定 fail: TITLE_TOO_LONG, UNCITED_FEATURE, BANNED_TERM, MISSING_CLOSING_SLOGAN | estimate_duration | 同步检查规则合规性，事实均引用素材原文 |
-| 5 | estimate_duration | 总时长 12s，目标 12s，判定 pass | check_rules | 上轮15秒超出且规则fail，压缩旁白并修标题措辞 |
-| 6 | check_rules | 判定 pass | submit_script | 同步复查改后脚本是否满足禁用词与结尾品牌语规则 |
-| 7 | submit_script | 提交通过 | END:completed | 时长12.0秒与规则均pass，提交同一份脚本 |
+| 1 | search_materials | 命中 3 条: P01, P02, P04 | estimate_duration | 需先获取剪刀鱼三个卖点的素材事实 |
+| 2 | estimate_duration | 总时长 15.25s，目标 12s，判定 too_long，超出 3.25s | check_rules | 素材已拿到三个卖点，先估算 12 秒是否放得下 |
+| 3 | check_rules | 判定 fail: UNSUPPORTED_TERM, UNCITED_FEATURE, MISSING_CLOSING_SLOGAN | estimate_duration | 同时检查脚本是否有事实或品牌表述问题 |
+| 4 | estimate_duration | 总时长 9.75s，目标 12s，判定 pass | check_rules | 首版 15.25 秒超时且规则失败，压缩为四镜并修正引用 |
+| 5 | check_rules | 判定 pass | submit_script | 同步复检压缩版是否清除了不支持词与漏引用 |
+| 6 | submit_script | 提交通过 | END:completed | 压缩版时长 9.75 秒通过、规则 pass，提交同一份脚本 |
 
-要点：第 3 步是**工具**判的 `too_long`（不是模型自述），第 4 步的违规项给出可执行的修改方向，第 5、6 步是同一份压缩稿的复检，第 7 步提交的也是同一份。最终 `result.json` 为 `completed`，5 个分镜，`total_duration_sec` 12.0，`checks` 两项都是 `pass`，`source_ids` 为 P01、P02、P04。第 1 条风险是模型自己写的：“素材仅提供三条极简事实……无法展开讲使用步骤或效果”。
+要点：第 2 步是**工具**判的 `too_long`（不是模型自述），第 3 步的违规项给出可执行的修改方向（包括词表拦下的“轻松”），第 4、5 步是同一份压缩稿的复检，第 6 步提交的也是同一份。最终 `result.json` 为 `completed`，4 个分镜，`total_duration_sec` 9.75，`checks` 两项都是 `pass`，`source_ids` 为 P01、P02、P04。第 2 条风险是模型自己写的：脚本“未展开任何使用效果、操作步骤或对比说明”。
 
 这条路径覆盖了题目“参考实例”的结构：素材只有一句话 → 首稿超时长 → 按检查结果压缩 → 重新估算 → 通过后提交同一份。
 
@@ -139,13 +138,13 @@
 
 两个用例的输入文件逐字节相同（`diff examples/inputs/01_normal.json examples/inputs/10_materials_changed.json` 无输出），唯一差别是 `cases.json` 里 `10` 用 `--data-dir examples/data_variants/no_subtitle`，那个目录的 `materials.json` 拿掉了 P01。
 
-`01_normal`（`examples/real/01_normal/trace.md`，11 次工具调用 / 7 轮模型决策）走完了一个完整的“初稿→修正→通关”过程（“第 N 步”同前，指 Trace 的 `seq`）：
+`01_normal`（`examples/real/01_normal/trace.md`，10 次工具调用 / 7 轮模型决策）走完了一个完整的“初稿→修正→通关”过程（“第 N 步”同前，指 Trace 的 `seq`）：
 
-- 第 1–2 步两次检索只拿到 P01，第 3 步换宽泛查询 0 条；
-- 第 4 步首稿 40.25 秒，判 `too_long`；
-- 第 5 步规则判 `fail`，违规里有 `TITLE_TOO_LONG`、`BANNED_TERM:第一`、`UNSUPPORTED_NUMBER:30`、`UNCITED_FEATURE`、`MISSING_CLOSING_SLOGAN`；
-- 第 6 步因为违规里提到 P02 的“竖屏”，模型回头检索“竖屏 画幅 导出”，拿到 P02、P03；
-- 第 7 步压到 25.5 秒，`pass`；第 8 步规则还剩一条 `UNCITED_FEATURE`；第 9–10 步重估与复检都 `pass`；第 11 步提交。
+- 第 1–3 步换了三次查询，只拿到 P01（第 2 次 0 条）；
+- 第 4 步首稿 26.25 秒，时长 `pass`；
+- 第 5 步规则判 `fail`，违规里有 `BANNED_TERM:第一`、`UNCITED_FEATURE`、`MISSING_CLOSING_SLOGAN`；
+- 第 6–7 步改稿后 26 秒 `pass`，但规则又拦下 `UNSUPPORTED_TERM:上手`；
+- 第 8–9 步删掉“上手”后两项都 `pass`；第 10 步提交。
 
 `10_materials_changed`（`examples/real/10_materials_changed/trace.md`，4 步）没有 P01，三次检索（含一次只用产品名）都是 0 条，第 4 步直接 `ask_user`，`missing_info=["materials"]`。
 
@@ -153,8 +152,8 @@
 
 另两条值得对照的路径：
 
-- **工具故障**：`04_tool_fail_transient` 第 4 步 `estimate_duration` 返回 `TOOL_UNAVAILABLE`、`retries_left=1`，同一轮的第 5 步 `check_rules` 正常返回 `fail`；第 8 步重估 `too_long`，第 10 步 `pass`，第 12 步提交成功。`05_tool_fail_permanent` 的 `check_rules` 连续两次不可用（`retries_left` 1→0），第 8 步 `report_failure`，`checks.rules` 是 `error` 而不是 `pass`。
-- **明确失败**：`07_over_duration_infeasible` 目标 3 秒。第 2 步两镜 5 秒 `too_long`；第 4 步只剩品牌语一镜，仍 3.25 秒 `too_long`；第 6 步 `report_failure`，理由写的是“仅品牌语一句已达3.25秒，超3秒硬上限”。`result.json` 里 `shots` 和 `total_duration_sec` 都是 `null`，只留 `unverified_draft` 和 `last_estimate` 作依据。
+- **工具故障**：`04_tool_fail_transient` 第 2 步 `estimate_duration` 返回 `TOOL_UNAVAILABLE`、`retries_left=1`，同一轮的第 3 步 `check_rules` 正常返回 `fail`；第 4–5 步模型漏填分镜 `id`，两个工具都返回 `INVALID_ARGS`，它据此补上；第 7 步重估 `too_long`，第 9 步 `pass`，第 10 步提交成功。`05_tool_fail_permanent` 的 `check_rules` 连续两次不可用（`retries_left` 1→0），第 8 步 `report_failure`，`checks.rules` 是 `error` 而不是 `pass`。
+- **明确失败**：`07_over_duration_infeasible` 目标 3 秒。第 2 步 3.5 秒 `too_long`，规则提示缺品牌语；第 4 步加上品牌语后 5 秒；第 7 步只留品牌语一镜，仍 3.25 秒 `too_long`；第 8 步 `report_failure`，理由写的是“仅品牌语一镜已3.25秒，超3秒上限”。`result.json` 里 `shots` 和 `total_duration_sec` 都是 `null`，只留 `unverified_draft` 和 `last_estimate` 作依据。
 
 ## 技术取舍
 
@@ -183,15 +182,15 @@
 `prompts.py` 的 system prompt 只说“时长以 `estimate_duration` 的返回为准”“规则以 `check_rules` 的返回为准”，不写“每秒 4 字”“品牌语是剪刀鱼，剪出属于你的故事”。
 
 - 好处：修正过程必须真的看工具结果，Trace 里能观察到“模型按违规清单改”这件事，而不是模型心算后一次写对；也顺带验证了工具返回的信息量是否足够。
-- 代价：多跑几轮。`01_normal` 的 Trace 第 5 步一次报出五类违规（标题超长、`第一`、`30`、未引用标签、缺品牌语），模型据此改稿、补引用、再复检，到第 10 步才全部通过。生产环境更常见的做法是提前把语速口径和品牌语写进 Prompt，减少来回。这个项目选“晚告知”，是因为评估的重点是“模型能否根据工具结果调整”，而不是省 token。
+- 代价：多跑几轮。`01_normal` 的 Trace 第 5 步一次报出三类违规（`第一`、未引用标签、缺品牌语），第 7 步又拦下“上手”，模型据此改稿、补引用、再复检，到第 9 步才全部通过。生产环境更常见的做法是提前把语速口径和品牌语写进 Prompt，减少来回。这个项目选“晚告知”，是因为评估的重点是“模型能否根据工具结果调整”，而不是省 token。
 
 ### 用词表而不是模型做事实校验
 
 `check_rules` 用确定性规则：`quote` 必须与素材 `facts` 逐字相同（NFKC 后比较）、数字必须是素材里出现过的完整数字、`banned_terms` 命中即违规、`unsupported_unless_in_source` 里的词只有在被引用的素材事实里出现才放行。
 
 - 好处：可复现、可测试、零成本、毫秒级，判定理由能直接写给模型（`detail` 里就是改法）；一致性测试可以离线重算同一份结果。
-- 代价：只能拦“词和数字”，拦不住换一种说法的夸大；中文数字覆盖不全；“第一次”会被“第一”误拦。这些都在 `docs/03-evaluation.md` 的已知限制里列明。
-- 为什么不用模型复核：再加一次模型判断会让“通过与否”变得不可复现，也把成本和延迟翻倍；而这个任务的素材只有 6 条、事实很短，词表 + 逐字引用已经能覆盖绝大部分编造。
+- 代价：只能拦“词和数字”，拦不住换一种说法的夸大；中文数字覆盖不全；“第一次”会被“第一”误拦。这些都在 `docs/03-evaluation.md` 的已知限制里列明。这不是理论风险：早期两批真实运行里，就有“字幕放哪都行”这样超出素材的句子通过了检查，详见 `docs/03-evaluation.md` 的失败记录。之后才收紧了 Prompt、扩充了词表，但词表只能覆盖已知说法，防不住所有新说法。
+- 为什么不用模型复核：再加一次模型判断会让“通过与否”变得不可复现，也把成本和延迟翻倍。代价是语义层面的编造只能靠 Prompt 约束和人工审阅，生产环境应该补上独立的事实审校环节。
 
 ### `decision_note` 只记录模型给出的简要依据
 
@@ -202,5 +201,42 @@
 ### 其他取舍
 
 - **不做真实素材检索**：6 条合成素材配词项匹配，够覆盖“命中/不命中/换查询”三种情况，也便于把“改素材目录后动作变化”做成可复现的用例。真实场景应换成向量检索或关键词服务，接口形状不变。
-- **不做 HTTP API**：题目允许三选一，CLI 最省事，也最容易在评审时复制粘贴。
+- **评审入口是 CLI**：题目允许三选一，CLI 最省事，也最容易在评审时复制粘贴。下面的 Web 工作台是可选的查看和编辑界面，不是评审入口。
 - **产物落盘而不是只打印**：`result.json` 给机器，`script.md` 给人改，`trace.jsonl` 给程序核对，`trace.md` 给人读。四种角色分开，比塞进一个大 JSON 更实用。
+
+## Web 工作台
+
+Web 工作台（`src/script_agent/web/`）在 CLI 之外提供一个本地界面：填写需求、实时看模型决策、编辑脚本并重新校验、导出结果、回放已提交的真实运行记录。
+
+### 架构
+
+```text
+浏览器（原生 ES Modules）
+  ↓ fetch / EventSource
+ThreadingHTTPServer → Handler（只负责读写）
+  ↓
+WebApp.dispatch()（路由、Host 和 Origin 检查，不依赖 socket）
+  ↓
+WebService（编排）→ RunManager（后台线程跑 run_once，记录供 SSE 读取）
+```
+
+**Agent 的决策逻辑没有改动。** 核心代码只有 `trace.py` 和 `app.py` 加了一个可选的 `listener` 参数，用来把 Trace 记录实时交给 Web 层；不传时行为不变。活动运行结束后，状态一律从 `runs/web/<run_id>/` 的产物读取，所以刷新页面或重启服务后仍能打开。
+
+### 技术取舍
+
+- **用标准库而不是 FastAPI：** 这是只监听本机的单用户工具，标准库够用。这样不新增依赖，装完项目后一条命令就能启动。代价是路由和请求检查要自己写，大约两百行。
+- **路由集中在 `dispatch()`：** 它接收方法、路径、请求头和请求体，返回响应对象，不碰 socket，接口测试因此不需要真实网络。
+- **不用前端框架和构建工具：** 不需要 npm，也不依赖 CDN 和外部字体。代价是状态和重绘要自己管，界面复杂后会比框架吃力。
+- **SSE 而不是 WebSocket：** 只有服务端单向推送，SSE 够用，浏览器还会自动重连。前端按记录序号去重，重连后不会重复显示步骤。
+
+### 校验不能被前端绕过
+
+`POST /api/verify` 只接收“来源”和“草稿”。目标时长、素材库、已检索素材 ID 和运行模式，全部由服务端从这条记录的 Trace 和结果里取，客户端多传的字段会被忽略。校验调用的是和 Agent 相同的 `estimate_duration`、`check_rules`，不调用模型。
+
+### 安全边界
+
+- 只监听 `127.0.0.1`，不提供 `--host`；`Host` 不是本机地址时拒绝，防 DNS 重绑定。
+- POST 必须是 `application/json`；带 `Origin` 时必须与 `Host` 一致，防其他网站跨站触发运行。
+- 客户端只传白名单 ID，运行 ID 过正则，静态文件走启动时建好的路径表，都不会把用户输入拼成文件路径。
+- 模型和用户文本一律通过文本节点显示，并配合严格的 CSP（不允许内联脚本和外部资源）。
+- 接口不返回密钥和 `LLM_BASE_URL`；运行崩溃时的错误文字先脱敏再写盘和返回。

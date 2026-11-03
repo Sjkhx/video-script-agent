@@ -71,7 +71,23 @@ python scripts/run_examples.py
 
 第一条跑单个用例，产物在 `runs/<时间戳>/`。第二条按 `examples/cases.json` 批量跑 10 个用例，直接覆盖写入 `examples/real/<case>/` 并重建 `examples/real/summary.json`、`examples/real/summary.md`；注意这会覆盖仓库里已提交的运行记录（想保留就先复制一份或用 git 恢复）。只重跑一个用例用 `python scripts/run_examples.py --case 06_over_duration_fixed`，其余用例的记录会保留。
 
-退出码：
+## Web 工作台（可选）
+
+题目要求的运行入口仍是上面的 CLI。Web 工作台是后加的可选界面，没有改动 Agent 的决策逻辑，也不新增依赖。
+
+```bash
+python -m script_agent.web --port 8765
+```
+
+启动后用浏览器打开 `http://127.0.0.1:8765`。
+
+- **没配置模型也能用：** 可以查看已提交的 10 条真实运行记录，也可以跑离线演示。Mock 的边界同上：只验证流程，不证明真实模型决策效果。
+- **实时轨迹：** 运行时逐步显示模型的动作、工具结果和决策依据。
+- **时间线：** 分镜按秒数显示长度，标出目标线和合格区，超时长的部分用红色斜纹。
+- **编辑并校验：** 分镜可以直接修改。重新校验只调用确定性的时长和规则工具，不调用模型，也不消耗 token。目标时长、素材库和已检索素材都由服务端根据这条记录决定，前端改不了。
+- **限制：** 只监听本机；同一时间只跑一个任务；运行产物保存在 `runs/web/<run_id>/`，重启服务后仍能打开。
+
+## 退出码
 
 - 单次运行（`python -m script_agent ...`）：`0` 完成或需要补充信息；`1` 失败或未完成；`2` 用法或配置错误（缺密钥时不会写任何产物，也不会静默退回 Mock）。
 - 批量运行（`python scripts/run_examples.py`）：`0` 表示所有用例都达到 `cases.json` 里的预期状态；`1` 表示至少一个用例偏离预期；`2` 表示配置或用例文件有误。`05`、`07` 的预期状态就是 `failed`，达标时不返回 `1`。
@@ -82,18 +98,18 @@ python scripts/run_examples.py
 
 | 验收点 | 复现命令 | 结果路径 | 实际状态 |
 |---|---|---|---|
-| 正常生成 | `python -m script_agent --input examples/inputs/01_normal.json` | `examples/real/01_normal/`（`result.json`、`script.md`、`trace.jsonl`、`trace.md`） | `completed`，6 分镜，25.5 秒 / 目标 30 秒，引用 P01、P02、P03 |
+| 正常生成 | `python -m script_agent --input examples/inputs/01_normal.json` | `examples/real/01_normal/`（`result.json`、`script.md`、`trace.jsonl`、`trace.md`） | `completed`，5 分镜，26 秒 / 目标 30 秒，引用 P01 |
 | 缺关键信息 | `python -m script_agent --input examples/inputs/02_missing_target.json` | `examples/real/02_missing_target/` | `needs_input`，`missing_info=["target_duration_sec"]`，一次 `ask_user` 结束 |
 | 无素材 | `python -m script_agent --input examples/inputs/03_no_material.json` | `examples/real/03_no_material/` | `needs_input`，三次不同查询均 0 条后 `ask_user`，`missing_info=["materials"]` |
-| 工具失败 | `python -m script_agent --input examples/inputs/04_tool_fail_transient.json --fail-tool estimate_duration --fail-times 1`<br>`python -m script_agent --input examples/inputs/05_tool_fail_permanent.json --fail-tool check_rules --fail-times -1` | `examples/real/04_tool_fail_transient/`（可恢复）；`examples/real/05_tool_fail_permanent/`（不可恢复） | `04` 为 `completed`（第 4 步故障、`retries_left=1`，重估后通过）；`05` 为 `failed`（`check_rules` 两次不可用，`retries_left=0` 后 `report_failure`） |
-| 超时长后的修正或明确失败 | `python -m script_agent --input examples/inputs/06_over_duration_fixed.json`<br>`python -m script_agent --input examples/inputs/07_over_duration_infeasible.json` | `examples/real/06_over_duration_fixed/`（修正）；`examples/real/07_over_duration_infeasible/`（明确失败） | `06` 为 `completed`，首估 `too_long` 后压到 12.0 秒；`07` 为 `failed`，仅品牌语一镜就 3.25 秒超过 3 秒上限 |
+| 工具失败 | `python -m script_agent --input examples/inputs/04_tool_fail_transient.json --fail-tool estimate_duration --fail-times 1`<br>`python -m script_agent --input examples/inputs/05_tool_fail_permanent.json --fail-tool check_rules --fail-times -1` | `examples/real/04_tool_fail_transient/`（可恢复）；`examples/real/05_tool_fail_permanent/`（不可恢复） | `04` 为 `completed`（第 2 步故障、`retries_left=1`，重估后通过）；`05` 为 `failed`（`check_rules` 两次不可用，`retries_left=0` 后 `report_failure`） |
+| 超时长后的修正或明确失败 | `python -m script_agent --input examples/inputs/06_over_duration_fixed.json`<br>`python -m script_agent --input examples/inputs/07_over_duration_infeasible.json` | `examples/real/06_over_duration_fixed/`（修正）；`examples/real/07_over_duration_infeasible/`（明确失败） | `06` 为 `completed`，首估 15.25 秒 `too_long`，压到 9.75 秒（目标 12 秒，合格范围 9.6–12 秒）；`07` 为 `failed`，仅品牌语一镜就 3.25 秒超过 3 秒上限 |
 
 另外三个用例也一并提交了，覆盖“改输入后动作是否变化”这类审核要点：
 
 | 用例 | 复现命令 | 结果路径 | 实际状态 |
 |---|---|---|---|
 | 规则风险、不编造 | `python -m script_agent --input examples/inputs/08_rule_conflict.json` | `examples/real/08_rule_conflict/` | `completed`，脚本没写用户要求的“效率提升 80%”，改到 `risks` 里说明缺数据 |
-| 改写查询 | `python -m script_agent --input examples/inputs/09_query_rewrite.json` | `examples/real/09_query_rewrite/` | `completed`，29.5 秒，仅引用 P01 |
+| 改写查询 | `python -m script_agent --input examples/inputs/09_query_rewrite.json` | `examples/real/09_query_rewrite/` | `completed`，25.5 秒，仅引用 P01 |
 | 改检索结果 | `python -m script_agent --input examples/inputs/10_materials_changed.json --data-dir examples/data_variants/no_subtitle` | `examples/real/10_materials_changed/` | `needs_input`，同一需求换个素材目录后从“能写”变成“无素材” |
 
 **怎么读结果：** `result.json` 是机器可读的最终结果，`script.md` 是可直接编辑的脚本，`trace.md` 是给人看的逐步表格（步骤、动作、关键参数、返回摘要、下一步、决策依据），`trace.jsonl` 是同一份记录的逐行 JSON（含每轮 token 用量）。`summary.json` 是结果索引，`summary.md` 是同一份汇总的表格版。
@@ -147,16 +163,22 @@ python -m script_agent --input examples/inputs/01_normal.json --fail-tool check_
 
 与 `docs/03-evaluation.md` 的“已知限制”一节相同：
 
-1. 词表和数字校验拦不全语义上的夸大。换一种说法描述素材没有的能力（例如只引用了“支持字幕”，却写“把说过的话变成屏幕上的字，不用自己打”），检查不会报错。
+1. 词表和数字校验拦不全语义上的夸大。词表只覆盖已知说法，换一种说法描述素材没有的能力（例如只引用了“支持字幕”，却写“说过的话都会出现在屏幕上，样式也能改”），检查不会报错。
 2. 中文数字只校验带倍、成、折和“百分之”的写法。“十二种”这类写法查不出来，只有阿拉伯数字会被拦。
 3. 旁白是否真实表达了 `claims` 引用的那一条事实，没有语义校验。引用逐字校验只保证 `quote` 是素材原文。
 4. “第一次”这类正常表达会被“第一”误拦。`banned_terms` 是子串匹配，没有词边界。
 5. 语速是固定估算：汉字每秒 4 个、每镜加 0.5 秒停顿，不是真实配音时长。
-6. 真实模型每次输出不同，`examples/real/` 只代表当次运行。两批记录的动作序列就有差异。
+6. 真实模型每次输出不同，`examples/real/` 只代表当次运行。几批记录的动作序列都有差异。
 7. 素材级授权：引用某条素材后，该素材的其它事实也被视为有据。例如引用 P05 的“基础版免费使用”后，写“会员价 18 元/月”不会被拦。
 8. 某一轮模型没有调用工具时，这一轮没有 token 用量记录，`total_tokens` 会少算这一轮。
+9. 严格贴着素材写，脚本可能信息量偏低。素材只有“支持字幕”一条时，旁白只能反复表达这一点。词表也可能误拦正常说法，比如“快速滑动”“简单说”，模型需要换一种写法。
 
 ## 实际用时与未完成部分
 
-- 实际用时：`【需本人填写】`
-- 未完成部分：`【需本人填写】`
+- 实际用时：约 9 小时，分两天。第一天（2026-11-02 01:00–09:11）完成核心链路、Trace 与模型客户端、CLI、10 个真实用例的前两批运行和评估文档；第二天（2026-11-03）做质量复查与第三批重跑、Web 工作台，以及娱乐向素材库的补充验证。不含评审准备和本次填写文档的时间。约 3 小时的题目建议时长没守住，主要差在第三批全量重跑（收紧规则后旧记录全部失效）和 Web 工作台这两块。
+- 未完成部分：
+  1. **Web 工作台和本批代码尚未提交到 git。** 工作区有 71 个改动文件未进版本库，其中 `src/script_agent/web/` 整个目录、`src/` 下 5 个文件的修改、`tests/test_web_*.py` 都还是未跟踪状态。文档已把 Web 工作台当交付物描述，但仓库里没有对应提交。
+  2. **“纯剧情、零产品植入”的脚本无法生成。** `check_rules` 的首条规则是必须至少引用一条素材（`NO_SOURCE`），所以用户要求“不带产品的搞笑短剧”时，模型只能追问或硬插两句产品台词。题目只要求产品事实可追溯，没有要求必须植入，当前实现比题目更严。
+  3. **真实 socket 上的 Web 访问只在单机上验证过。** `test_real_socket_roundtrip` 带 `skipif` 探针，环境不允许本机回环时会被静默跳过（之前记录的 316 passed / 1 skipped 就是这种情况）；本次允许回环，已实际执行并通过。界面是手动在浏览器点过的，没有自动化端到端。
+  4. **素材库不足以支撑 30 秒有信息量的脚本。** 默认库 6 条素材、7 条事实，全部用上也只到 19.5 秒，模型只能靠重复或情绪铺垫凑时长。
+  5. **语义层面的编造仍然拦不住。** 词表只覆盖已知说法，换一种说法就能绕过，详见 `docs/03-evaluation.md` 的已知限制第 1 条。
