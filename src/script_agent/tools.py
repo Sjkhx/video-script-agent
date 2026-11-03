@@ -253,6 +253,13 @@ def check_rules(
 
     seen_ids: set[int] = set()
     for shot in draft.shots:
+        if shot.id <= 0:
+            add(
+                "INVALID_SHOT_ID",
+                shot.id,
+                f"分镜序号 {shot.id} 不合法，请使用从 1 开始的正整数。",
+                str(shot.id),
+            )
         if shot.id in seen_ids:
             add(
                 "DUPLICATE_SHOT_ID",

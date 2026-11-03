@@ -168,6 +168,7 @@
 | `09_query_rewrite` 的 `risks` 里引用了脚本中不存在的旁白 | 终审逐条核对 `result.json` 中 `risks` 的引号内容与脚本正文 | 重跑该用例，未手改 `examples/real/` |
 | 模型响应里 `message` 为空时抛出未捕获的 `AttributeError`，这次运行不留 `result.json` | 质量复查时用假响应探测 | `llm.py` 转成 `LLMError`，回归测试 `test_missing_message_becomes_llm_error` |
 | 空白标题、空白分镜、重复分镜序号都能通过规则；纯标点旁白也算 2 秒，可以用来凑时长 | 质量复查时探测 | `check_rules` 新增 `EMPTY_TEXT`、`NO_SPEECH`、`DUPLICATE_SHOT_ID` |
+| 分镜序号为 `0` 或负数也能通过全部检查，产物表格里会出现“-1”这样的序号 | 交付前手工探测边界值时发现；先写 `test_non_positive_shot_ids_are_rejected` 确认在旧实现上失败（RED），再改实现（GREEN） | `check_rules` 新增 `INVALID_SHOT_ID` |
 
 ## Mock 边界
 

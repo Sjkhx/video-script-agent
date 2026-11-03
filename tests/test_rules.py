@@ -70,6 +70,14 @@ def test_duplicate_shot_ids_are_rejected():
     draft["shots"][1]["id"] = draft["shots"][0]["id"]
     assert "DUPLICATE_SHOT_ID" in codes(draft)
 
+
+@pytest.mark.parametrize("shot_id", [0, -1])
+def test_non_positive_shot_ids_are_rejected(shot_id):
+    """分镜序号是给人看的定位，0 和负数会原样印进 script.md 的表格。"""
+    draft = fit_draft()
+    draft["shots"][0]["id"] = shot_id
+    assert "INVALID_SHOT_ID" in codes(draft)
+
 @pytest.mark.parametrize("text", ["提高８０％", "快了三倍", "百分之八十的人"])
 def test_number_variants_are_rejected(text):
     assert "UNSUPPORTED_NUMBER" in codes(with_narration(1, text))

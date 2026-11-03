@@ -84,8 +84,8 @@
 |---|---|
 | 入参 | `title`、`shots`、`decision_note` |
 | 返回 | `{ok, verdict: "pass" 或 "fail", violations: [{code, shot_id, detail, evidence}]}` |
-| 检查项 | 全脚本无引用、标题超长、引用素材不存在、引用素材本次未检索到、`quote` 不是素材原文、品牌禁用词、无素材支持的词、无素材支持的数字、未引用素材的标签被提到、末镜没有以品牌语结尾 |
-| 违规码 | `NO_SOURCE`、`TITLE_TOO_LONG`、`SOURCE_NOT_FOUND`、`SOURCE_NOT_RETRIEVED`、`CLAIM_NOT_IN_SOURCE`、`BANNED_TERM`、`UNSUPPORTED_TERM`、`UNSUPPORTED_NUMBER`、`UNCITED_FEATURE`、`MISSING_CLOSING_SLOGAN` |
+| 检查项 | 全脚本无引用、标题超长、分镜序号非正或重复、空白文本、无语音内容的旁白、引用素材不存在、引用素材本次未检索到、`quote` 不是素材原文、品牌禁用词、无素材支持的词、无素材支持的数字、未引用素材的标签被提到、末镜没有以品牌语结尾 |
+| 违规码 | `NO_SOURCE`、`TITLE_TOO_LONG`、`INVALID_SHOT_ID`、`DUPLICATE_SHOT_ID`、`EMPTY_TEXT`、`NO_SPEECH`、`SOURCE_NOT_FOUND`、`SOURCE_NOT_RETRIEVED`、`CLAIM_NOT_IN_SOURCE`、`BANNED_TERM`、`UNSUPPORTED_TERM`、`UNSUPPORTED_NUMBER`、`UNCITED_FEATURE`、`MISSING_CLOSING_SLOGAN` |
 
 ### submit_script / ask_user / report_failure
 
