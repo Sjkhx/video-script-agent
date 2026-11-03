@@ -10,5 +10,8 @@ requires-python = ">=3.12"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"script_agent.web" = ["static/*", "static/js/*", "static/js/views/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

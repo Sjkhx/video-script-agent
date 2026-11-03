@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from typing import Callable
 
 from .agent import run_agent
 from .llm import LLMClient
@@ -38,8 +39,12 @@ def run_once(
     max_steps: int,
     max_tool_calls: int,
     out_dir: Path,
+    listener: Callable[[dict], None] | None = None,
 ) -> AgentResult:
-    """跑一次 Agent 并在 out_dir 写 result.json、script.md、trace.jsonl、trace.md。"""
+    """跑一次 Agent 并在 out_dir 写 result.json、script.md、trace.jsonl、trace.md。
+
+    listener 会收到每条 Trace 记录的副本，供 Web 界面实时展示；不传时行为不变。
+    """
     request = normalize_request(raw_request)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -55,6 +60,7 @@ def run_once(
         max_steps=max_steps,
         max_tool_calls=max_tool_calls,
         secrets=_secrets_from_env(),
+        listener=listener,
     )
     registry = ToolRegistry(request, Path(data_dir), fault)
     result = run_agent(

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>脚本剪辑台</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/app.css">
+<script type="module" src="/js/main.js"></script>
+</head>
+<body data-view="script">
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="icon-check" viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 5"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></symbol>
+  <symbol id="icon-alert" viewBox="0 0 16 16"><path d="M8 2.5l6.2 11H1.8zM8 6.6v3.2M8 11.5v.3"/></symbol>
+  <symbol id="icon-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 7.3v3.6M8 5.1v.3"/></symbol>
+  <symbol id="icon-chevron" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4"/></symbol>
+  <symbol id="icon-copy" viewBox="0 0 16 16"><rect x="5.5" y="5.5" width="8" height="8" rx="1"/><path d="M10.5 3h-7a1 1 0 0 0-1 1v7"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 16 16"><path d="M8 2.5v8M4.8 7.5L8 10.7l3.2-3.2M3 13.5h10"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 16 16"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></symbol>
+</svg>
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M1 12.5L6 1.5M6.5 12.5l5-11"/></svg>
+    <span>脚本剪辑台</span>
+  </div>
+  <div class="runstate" id="run-state" aria-live="polite"></div>
+  <div class="modelstate" id="model-state"></div>
+</header>
+<nav class="viewswitch" id="view-switch" aria-label="切换面板">
+  <button type="button" data-view-target="brief">需求</button>
+  <button type="button" data-view-target="script">脚本</button>
+  <button type="button" data-view-target="trace">轨迹</button>
+</nav>
+<div class="shell">
+  <aside class="panel panel-brief" id="panel-brief" aria-label="需求与记录"></aside>
+  <main class="panel panel-script" id="panel-script"></main>
+  <aside class="panel panel-trace" id="panel-trace" aria-label="决策轨迹"></aside>
+</div>
+</body>
+</html>

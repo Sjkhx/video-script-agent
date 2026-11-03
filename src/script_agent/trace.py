@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 from .models import AgentResult
 
@@ -321,7 +322,9 @@ class TraceRecorder:
         max_steps: int,
         max_tool_calls: int,
         secrets: Iterable[str] = (),
+        listener: Callable[[dict], None] | None = None,
     ) -> None:
+        self._listener = listener
         self.out_dir = Path(out_dir)
         self.out_dir.mkdir(parents=True, exist_ok=True)
         self._jsonl_path = self.out_dir / "trace.jsonl"
@@ -421,17 +424,19 @@ class TraceRecorder:
                 step["next_action"] = self._steps[index + 1]["action"]
             else:
                 step["next_action"] = f"END:{status}"
-        self._records.append({
+        end_record = {
             "type": "run_end",
             "status": status,
             "steps_used": _int(result.steps_used),
             "tool_calls_used": _int(result.tool_calls_used),
             "total_tokens": self._total_tokens(),
-        })
+        }
+        self._records.append(end_record)
         # 步骤是边跑边追加的，finish 时用回填后的记录整体重写。
         self._write_jsonl()
         self._write_markdown()
         self._finished = True
+        self._notify(end_record)
 
     # -- 内部 ---------------------------------------------------------------
 
@@ -443,6 +448,16 @@ class TraceRecorder:
         self._records.append(record)
         with self._jsonl_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+        self._notify(record)
+
+    def _notify(self, record: dict) -> None:
+        """把记录副本交给监听器；监听器出任何问题都不能影响运行和产物。"""
+        if self._listener is None:
+            return
+        try:
+            self._listener(copy.deepcopy(record))
+        except Exception:
+            pass
 
     def _write_jsonl(self) -> None:
         text = "\n".join(
